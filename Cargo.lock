@@ -33,7 +33,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rfs-sqlite"
+name = "sqlite-fsr"
 version = "0.1.0"
 dependencies = [
  "anyhow",

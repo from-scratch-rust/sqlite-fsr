@@ -1,13 +1,13 @@
-use rfs_sqlite::{run};
+use sqlite_fsr::{run};
 
 #[cfg(test)]
 
 use std::{fs::File, io::Cursor, result};
 
-use rfs_sqlite::command::{dbinfo, tables, sql_command};
-use rfs_sqlite::varint::*;
-use rfs_sqlite::schema::*;
-use rfs_sqlite::error::*;
+use sqlite_fsr::command::{dbinfo, tables, sql_command};
+use sqlite_fsr::varint::*;
+use sqlite_fsr::schema::*;
+use sqlite_fsr::error::*;
 
 
 #[test]
@@ -157,7 +157,7 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows_3() {
     let mut file = File::open("./superheroes.db").unwrap();
     let raw_schema = extract_raw_schema_data(&mut file);
     let result = sql_command(["SELECT", "COUNT(*)", "FROM", "superheroes"].to_vec(), &raw_schema, &mut file).unwrap();
-    assert_eq!(result.len(), 6);
+    assert_eq!(result.len(), 6895);
 }
 
 

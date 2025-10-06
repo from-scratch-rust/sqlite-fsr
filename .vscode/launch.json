@@ -11,11 +11,11 @@
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=rfs-sqlite",
-                    "--package=rfs-sqlite"
+                    "--bin=sqlite-fsr",
+                    "--package=sqlite-fsr"
                 ],
                 "filter": {
-                    "name": "rfs-sqlite",
+                    "name": "sqlite-fsr",
                     "kind": "bin"
                 }
             },
@@ -29,11 +29,11 @@
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=rfs-sqlite",
-                    "--package=rfs-sqlite"
+                    "--bin=sqlite-fsr",
+                    "--package=sqlite-fsr"
                 ],
                 "filter": {
-                    "name": "rfs-sqlite",
+                    "name": "sqlite-fsr",
                     "kind": "bin"
                 }
             },
@@ -47,11 +47,11 @@
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=rfs-sqlite",
-                    "--package=rfs-sqlite"
+                    "--bin=sqlite-fsr",
+                    "--package=sqlite-fsr"
                 ],
                 "filter": {
-                    "name": "rfs-sqlite",
+                    "name": "sqlite-fsr",
                     "kind": "bin"
                 }
             },
@@ -61,13 +61,13 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'rfs-sqlite'",
+            "name": "Debug unit tests in executable 'sqlite-fsr'",
             "cargo": {
                 "args": [
                     "test"
                 ],
                 "filter": {
-                    "name": "rfs-sqlite",
+                    "name": "sqlite-fsr",
                     "kind": "bin"
                 }
             },

@@ -1,4 +1,4 @@
-use rfs_sqlite::run;
+use sqlite_fsr::run;
 pub mod varint;
 fn main()  {
     let args = std::env::args().collect::<Vec<String>>();
