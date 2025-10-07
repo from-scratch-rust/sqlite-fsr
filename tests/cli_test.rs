@@ -160,6 +160,14 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows_3() {
     assert_eq!(result.len(), 6895);
 }
 
+#[test]
+fn test_COUNT_sql_command_returns_correct_number_of_rows_4() {
+    let mut file = File::open("./companies.db").unwrap();
+    let raw_schema = extract_raw_schema_data(&mut file);
+    let result = sql_command(["SELECT", "COUNT(*)", "FROM", "companies"].to_vec(), &raw_schema, &mut file).unwrap();
+    assert_eq!(result.len(), 55991);
+}
+
 
 #[test]
 fn test_COUNT_sql_command_returns_error_when_table_not_found() {
