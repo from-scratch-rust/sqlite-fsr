@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{self, Read, Seek, SeekFrom};
+use std::io::{Read, Seek, SeekFrom};
 
 
 use crate::schema::*;
@@ -35,11 +35,11 @@ pub fn sql_command(command_components: Vec<&str>, schema_data: &SchemaRAW, file:
                             file.seek(SeekFrom::Start(schema_data.page_size as u64 * (entry.rootpage-1)  as u64)).expect("seek failed");
                             let mut table_page_buf = vec![0; schema_data.page_size as usize];
                             file.read_exact(&mut table_page_buf).expect("failed to read row size for table");
-                            let table_page: TablePage = match table_page_buf[0] {
-                                0x0D => TablePage::Leaf(LeafTablePage::from_bytes(&table_page_buf)),
-                                0x05 => TablePage::Interior(InteriorTablePage::from_bytes(&table_page_buf, &file)),
-                                _    => panic!("unsupported page type"),
-                            };
+                            let mut table_page: TablePage = match table_page_buf[0] {
+                                                                0x0D => TablePage::Leaf(LeafTablePage::from_bytes(&table_page_buf)),
+                                                                0x05 => TablePage::Interior(InteriorTablePage::from_bytes(&table_page_buf, file)),
+                                                                _    => panic!("unsupported page type"),
+                                                            };
                             let table_rows = table_page.to_table_rows();
                             Ok(table_rows)
                         },

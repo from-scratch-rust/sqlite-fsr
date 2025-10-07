@@ -6,13 +6,9 @@ pub mod command;
 pub mod record;
 
 use std::fs::File;
-use std::io::{self, Read, Seek, SeekFrom};
-use std::os::unix::fs::FileExt;
 use std::path::PathBuf;
-use std::convert::TryInto;
 
 use crate::schema::*;
-use crate::varint::parse_varint;
 use crate::error::*;
 use crate::command::*;
 

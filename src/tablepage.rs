@@ -1,12 +1,12 @@
 use std::fs::File;
-use std::result;
+use std::io::{Read, Seek, SeekFrom};
 
 use crate::varint::parse_varint;
 use crate::record::Record;
 
 
 pub trait Table {
-    fn to_table_rows(&self) -> Vec<Record>;
+    fn to_table_rows(&mut self) -> Vec<Record>;
 }
 
 
@@ -16,13 +16,14 @@ pub enum TablePage<'a> {
 }
 
 impl Table for TablePage<'_> {
-    fn to_table_rows(&self) -> Vec<Record> {
+    fn to_table_rows(&mut self) -> Vec<Record> {
         match self {
             TablePage::Leaf(p) => p.to_table_rows(),
             TablePage::Interior(p) => p.to_table_rows(),
         }
     }
 }
+
 #[derive(Debug)]
 pub struct LeafTablePage {
     pub header: [u8; 8],
@@ -65,11 +66,11 @@ impl LeafTablePage {
 
 impl Table for LeafTablePage {
 
-    fn to_table_rows(&self) -> Vec<Record> {
+    fn to_table_rows(&mut self) -> Vec<Record> {
         let mut table_rows: Vec<Record> = Vec::new();
         for cells_index in 0..self.cells.len() {
             let cell = &self.cells[cells_index];
-            let (cell_size, cell_size_varint_size) = parse_varint(&cell[0..9]);
+            let (_, cell_size_varint_size) = parse_varint(&cell[0..9]);
             let (row_id, row_id_varint_size) = parse_varint(&cell[cell_size_varint_size..cell_size_varint_size+9]);
             
             let cell_content_offset = cell_size_varint_size + row_id_varint_size;
@@ -119,21 +120,19 @@ impl Table for LeafTablePage {
 }
 
 
-
-
 #[derive(Debug)]
 pub struct InteriorTablePage<'a> {
     pub header: [u8; 12],
     pub cells: Vec<(u32, i64)>,
-    pub file: &'a File
+    pub file: &'a mut File
 }
 
 impl<'a> InteriorTablePage<'a> {
-    pub fn from_bytes(data: &[u8], file: &'a File) -> Self {
+    pub fn from_bytes(data: &[u8], file: &'a mut File) -> Self {
         let header: [u8; 12] = data[0..12].try_into().unwrap();
         let cell_count = u16::from_be_bytes([header[3], header[4]]);
 
-        let cell_pointer_array: Vec<u16> = data[8..(8 + (cell_count * 2) as usize)]
+        let cell_pointer_array: Vec<u16> = data[12..(12 + (cell_count * 2) as usize)]
                                             .chunks_exact(2)
                                             .map(|chunk| u16::from_be_bytes([chunk[0], chunk[1]]))
                                             .collect();
@@ -157,8 +156,41 @@ impl<'a> InteriorTablePage<'a> {
 }
 
 impl Table for InteriorTablePage<'_> {
-    fn to_table_rows(&self) -> Vec<Record> {
-        let result: Vec<Record> = Vec::new();
+    fn to_table_rows(&mut self) -> Vec<Record> {
+        let mut result: Vec<Record> = Vec::new();
+        let mut tblrowcount = 0;
+        for index in 0..self.cells.len() {
+            let cell = self.cells[index];
+            print!("page_number: {} ", cell.0);
+            print!("rowid: {} \n", cell.1);
+
+            self.file.seek(SeekFrom::Start(0));
+
+            let page_size = 4096;
+            let mut page_buffer = vec![0u8; page_size as usize];
+            let start = page_size * (cell.0 - 1) as u64;
+            self.file.seek(SeekFrom::Start(start));
+            self.file.read_exact(&mut page_buffer);
+
+            let mut table_page: TablePage = match page_buffer[0] {
+                                    0x0D => TablePage::Leaf(LeafTablePage::from_bytes(&page_buffer)),
+                                    0x05 => TablePage::Interior(InteriorTablePage::from_bytes(&page_buffer, self.file)),
+                                    0x0a => {
+                                        println!("index b-tree leaf page type not supported");
+                                        continue;
+                                    },
+                                    0x02 => {
+                                        println!("index b-tree interior page type not supported");
+                                        continue;
+                                    },
+                                    e => panic!("unsupported page type {}", e),
+                                };
+            let table_rows = table_page.to_table_rows();
+            tblrowcount += table_rows.len();
+            println!("tblrowcount: {}", tblrowcount);
+            // table_rows.iter().for_each(|r| println!("{}", r));
+            result.extend(table_rows);
+        }
         return result;
     }
 }

@@ -55,7 +55,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["./companies.db", "\"SELECT COUNT(*) FROM companies\""],
+            "args": ["./superheroes.db", "\"SELECT COUNT(*) FROM superheroes\""],
             "cwd": "${workspaceFolder}"
         },
         {

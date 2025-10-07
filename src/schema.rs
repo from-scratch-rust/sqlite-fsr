@@ -29,7 +29,7 @@ impl SchemaRAW {
                                         0x05 => data[100..112].try_into().unwrap(),
                                         _ => panic!("Unrecognized page type id for schema page")
                                     };
-        let cell_count= u16::from_be_bytes([page_header[3], page_header[4]]);
+        let cell_count = u16::from_be_bytes([page_header[3], page_header[4]]);
 
         let cell_pointer_array: Vec<u16> = data[108..(108 + (cell_count * 2)) as usize]
                                             .chunks_exact(2)
@@ -39,7 +39,7 @@ impl SchemaRAW {
         let mut cells: Vec<Vec<u8>> = Vec::new();
         for index in 0..cell_pointer_array.len() {
             let cell_pointer = cell_pointer_array[index] as usize;
-            let (cell_size, cell_size_varint_size) = parse_varint(&data[cell_pointer..cell_pointer+9]);
+            let (cell_size, _) = parse_varint(&data[cell_pointer..cell_pointer+9]);
             // Slice out the cell
             let cell_end = cell_pointer + cell_size as usize;
             let cell = data[cell_pointer..cell_end].to_vec();
