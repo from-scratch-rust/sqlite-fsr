@@ -4,6 +4,7 @@ pub mod error;
 pub mod tablepage;
 pub mod command;
 pub mod record;
+pub mod indexpage;
 
 use std::fs::File;
 use std::path::PathBuf;
