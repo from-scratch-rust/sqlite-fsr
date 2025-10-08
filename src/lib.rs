@@ -5,9 +5,12 @@ pub mod command;
 use std::fs::File;
 use std::path::PathBuf;
 
-use crate::command::*;
 use crate::models::error::*;
 use crate::models::schema::*;
+use crate::command::tables;
+use crate::command::dbinfo;
+use crate::command::sql;
+
 
 pub fn run(args: &[String]) -> Result<String, RunError> {
     if args.len() <= 1 {
@@ -31,18 +34,18 @@ pub fn run(args: &[String]) -> Result<String, RunError> {
     let raw_schema = extract_raw_schema_data(&mut file);
     let output = match command[0] {
                         ".dbinfo" => {
-                            let (page_size, table_count) = dbinfo(&raw_schema);
+                            let (page_size, table_count) = dbinfo::get_dbinfo(&raw_schema);
                             Ok(format!(
                                 "database page size: {}\nnumber of tables: {}",
                                 page_size, table_count
                             ))
                         }
                         ".tables" => {
-                            let tables = tables(&raw_schema);
+                            let tables = tables::get_table_names(&raw_schema);
                             Ok(format!("{}", tables.join(" ")))
                         }
                         "SELECT" => {
-                            let result = sql_command(command, &raw_schema, &mut file);
+                            let result = sql::execute(command, &raw_schema, &mut file);
                             match result {
                                 Ok(rows) => Ok(format!("{}", rows.len())),
                                 Err(e) => Err(e)?

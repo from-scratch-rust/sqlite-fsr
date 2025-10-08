@@ -1,29 +1,11 @@
 use std::fs::File;
-use std::io::{Read, Seek, SeekFrom};
-
-
+use std::io::{SeekFrom, Seek, Read};
+use crate::models::schema::*;
 use crate::models::tablepage::*;
 use crate::models::error::SQLCommandError;
 use crate::models::record::Record;
-use crate::models::schema::*;
 
-pub fn dbinfo(schema_data: &SchemaRAW) -> (u16, usize) {
-    return (schema_data.page_size, schema_data.cells.len());
-}
-
-
-pub fn tables(schema_data: &SchemaRAW) -> Vec<String> {
-    let mut table_names: Vec<String>  = Vec::from([]); 
-    for schemarow_header in schema_data.to_schema_rows() {
-        if !schemarow_header.name.starts_with("sqlite_") { 
-            table_names.push(schemarow_header.table_name); 
-        }
-    }
-    return table_names;
-}
-
-
-pub fn sql_command(command_components: Vec<&str>, schema_data: &SchemaRAW, file: &mut File) -> Result<Vec<Record>, SQLCommandError> {
+pub fn execute(command_components: Vec<&str>, schema_data: &SchemaRAW, file: &mut File) -> Result<Vec<Record>, SQLCommandError> {
     let target_table = command_components[command_components.len()-1];
     let target_table_schema_entry: Option<SchemaRow> = schema_data
                                                         .to_schema_rows()

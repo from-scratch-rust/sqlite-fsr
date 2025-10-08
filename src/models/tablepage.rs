@@ -136,7 +136,6 @@ impl<'a> InteriorTablePage<'a> {
                                         0 => None,
                                         n => Some(n)
                                     };
-        println!("sibling_page_number: {}",sibling_page_number.unwrap());
         let cell_pointer_array: Vec<u16> = data[12..(12 + (cell_count * 2) as usize)]
                                             .chunks_exact(2)
                                             .map(|chunk| u16::from_be_bytes([chunk[0], chunk[1]]))
@@ -166,8 +165,6 @@ impl Table for InteriorTablePage<'_> {
         let mut tblrowcount = 0;
         for index in 0..self.cells.len() {
             let cell = self.cells[index];
-            // print!("page_number: {} ", cell.0);
-            // print!("rowid: {} \n", cell.1);
 
             self.file.seek(SeekFrom::Start(0));
 

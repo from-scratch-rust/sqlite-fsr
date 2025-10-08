@@ -4,7 +4,7 @@ use sqlite_fsr::{run};
 
 use std::{fs::File, io::Cursor, result};
 
-use sqlite_fsr::command::{dbinfo, tables, sql_command};
+use sqlite_fsr::command::{dbinfo, tables, sql};
 use sqlite_fsr::utils::varint::*;
 use sqlite_fsr::models::schema::*;
 use sqlite_fsr::models::error::*;
@@ -58,7 +58,7 @@ fn test_dbinfo_command_reads_pagesize_correctly() {
         cells: Vec::new(),
     };
 
-    let (result, _) = dbinfo(&schema);
+    let (result, _) = dbinfo::get_dbinfo(&schema);
     assert_eq!(result, 4096);
 }
 
@@ -81,7 +81,7 @@ fn test_dbinfo_command_reads_table_count_correctly() {
         ],
     };
 
-    let (_, result) = dbinfo(&schema);
+    let (_, result) = dbinfo::get_dbinfo(&schema);
     assert_eq!(result, 3);
 }
 
@@ -90,7 +90,7 @@ fn test_dbinfo_command_reads_table_count_correctly() {
 fn test_tables_command_reads_table_names_correctly() {
     let mut file = File::open("./sample.db").unwrap();
     let raw_schema = extract_raw_schema_data(&mut file);
-    let result = tables(&raw_schema);
+    let result = tables::get_table_names(&raw_schema);
     assert_eq!(result, ["apples", "oranges"]);
 }
 
@@ -140,7 +140,7 @@ fn test_COUNT_sql_command_executes_without_error() {
 fn test_COUNT_sql_command_returns_correct_number_of_rows() {
     let mut file = File::open("./sample.db").unwrap();
     let raw_schema = extract_raw_schema_data(&mut file);
-    let result = sql_command(["SELECT", "COUNT(*)", "FROM", "apples"].to_vec(), &raw_schema, &mut file).unwrap();
+    let result = sql::execute(["SELECT", "COUNT(*)", "FROM", "apples"].to_vec(), &raw_schema, &mut file).unwrap();
     assert_eq!(result.len(), 4);
 }
 
@@ -148,7 +148,7 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows() {
 fn test_COUNT_sql_command_returns_correct_number_of_rows_2() {
     let mut file = File::open("./sample.db").unwrap();
     let raw_schema = extract_raw_schema_data(&mut file);
-    let result = sql_command(["SELECT", "COUNT(*)", "FROM", "oranges"].to_vec(), &raw_schema, &mut file).unwrap();
+    let result = sql::execute(["SELECT", "COUNT(*)", "FROM", "oranges"].to_vec(), &raw_schema, &mut file).unwrap();
     assert_eq!(result.len(), 6);
 }
 
@@ -156,7 +156,7 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows_2() {
 fn test_COUNT_sql_command_returns_correct_number_of_rows_3() {
     let mut file = File::open("./superheroes.db").unwrap();
     let raw_schema = extract_raw_schema_data(&mut file);
-    let result = sql_command(["SELECT", "COUNT(*)", "FROM", "superheroes"].to_vec(), &raw_schema, &mut file).unwrap();
+    let result = sql::execute(["SELECT", "COUNT(*)", "FROM", "superheroes"].to_vec(), &raw_schema, &mut file).unwrap();
     assert_eq!(result.len(), 6895);
 }
 
@@ -164,7 +164,7 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows_3() {
 fn test_COUNT_sql_command_returns_correct_number_of_rows_4() {
     let mut file = File::open("./companies.db").unwrap();
     let raw_schema = extract_raw_schema_data(&mut file);
-    let result = sql_command(["SELECT", "COUNT(*)", "FROM", "companies"].to_vec(), &raw_schema, &mut file).unwrap();
+    let result = sql::execute(["SELECT", "COUNT(*)", "FROM", "companies"].to_vec(), &raw_schema, &mut file).unwrap();
     assert_eq!(result.len(), 55991);
 }
 
@@ -172,7 +172,7 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows_4() {
 fn test_SELECT_sql_command_returns_correct_values() {
     let mut file = File::open("./sample.db").unwrap();
     let raw_schema = extract_raw_schema_data(&mut file);
-    let result: Vec<String> = sql_command(["SELECT", "name", "FROM", "apples"].to_vec(), &raw_schema, &mut file)
+    let result: Vec<String> = sql::execute(["SELECT", "name", "FROM", "apples"].to_vec(), &raw_schema, &mut file)
                     .unwrap()
                     .iter()
                     .map(|record| record.to_string())
@@ -186,6 +186,6 @@ fn test_SELECT_sql_command_returns_correct_values() {
 fn test_COUNT_sql_command_returns_error_when_table_not_found() {
     let mut file = File::open("./sample.db").unwrap();
     let raw_schema = extract_raw_schema_data(&mut file);
-    let result = sql_command(["SELECT", "COUNT(*)", "FROM", "seafood"].to_vec(), &raw_schema, &mut file);
+    let result = sql::execute(["SELECT", "COUNT(*)", "FROM", "seafood"].to_vec(), &raw_schema, &mut file);
     assert!(result.is_err());
 }
