@@ -189,3 +189,12 @@ fn test_COUNT_sql_command_returns_error_when_table_not_found() {
     let result = sql::execute(["SELECT", "COUNT(*)", "FROM", "seafood"].to_vec(), &raw_schema, &mut file);
     assert!(result.is_err());
 }
+
+
+#[test]
+fn test_sql_command_returns_error_when_command_not_supported() {
+    let mut file = File::open("./sample.db").unwrap();
+    let raw_schema = extract_raw_schema_data(&mut file);
+    let result = sql::execute(["WHOOPTY", "COUNT(*)", "FROM", "seafood"].to_vec(), &raw_schema, &mut file);
+    assert!(result.is_err());
+}
