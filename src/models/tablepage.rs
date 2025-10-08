@@ -1,8 +1,8 @@
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 
-use crate::varint::parse_varint;
-use crate::record::Record;
+use crate::utils::varint::{parse_varint};
+use crate::models::record::Record;
 
 
 pub trait Table {

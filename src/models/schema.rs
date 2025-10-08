@@ -1,4 +1,4 @@
-use crate::varint::{parse_varint};
+use crate::utils::varint::{parse_varint};
 use std::io::{Read, Seek, SeekFrom};
 
 

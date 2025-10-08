@@ -1,17 +1,14 @@
-pub mod varint;
-pub mod schema;
-pub mod error;
-pub mod tablepage;
+pub mod utils;
+pub mod models;
 pub mod command;
-pub mod record;
 pub mod indexpage;
 
 use std::fs::File;
 use std::path::PathBuf;
 
-use crate::schema::*;
-use crate::error::*;
 use crate::command::*;
+use crate::models::error::*;
+use crate::models::schema::*;
 
 pub fn run(args: &[String]) -> Result<String, RunError> {
     if args.len() <= 1 {

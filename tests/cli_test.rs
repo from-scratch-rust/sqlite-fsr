@@ -5,9 +5,9 @@ use sqlite_fsr::{run};
 use std::{fs::File, io::Cursor, result};
 
 use sqlite_fsr::command::{dbinfo, tables, sql_command};
-use sqlite_fsr::varint::*;
-use sqlite_fsr::schema::*;
-use sqlite_fsr::error::*;
+use sqlite_fsr::utils::varint::*;
+use sqlite_fsr::models::schema::*;
+use sqlite_fsr::models::error::*;
 
 
 #[test]
@@ -166,6 +166,19 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows_4() {
     let raw_schema = extract_raw_schema_data(&mut file);
     let result = sql_command(["SELECT", "COUNT(*)", "FROM", "companies"].to_vec(), &raw_schema, &mut file).unwrap();
     assert_eq!(result.len(), 55991);
+}
+
+#[test]
+fn test_SELECT_sql_command_returns_correct_values() {
+    let mut file = File::open("./sample.db").unwrap();
+    let raw_schema = extract_raw_schema_data(&mut file);
+    let result: Vec<String> = sql_command(["SELECT", "name", "FROM", "apples"].to_vec(), &raw_schema, &mut file)
+                    .unwrap()
+                    .iter()
+                    .map(|record| record.to_string())
+                    .collect();
+                
+    assert_eq!(result, vec!["Granny Smith", "Fuji", "Honeycrisp", "Golden Delicious"]);
 }
 
 

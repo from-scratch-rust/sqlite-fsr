@@ -2,10 +2,10 @@ use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 
 
-use crate::schema::*;
-use crate::tablepage::*;
-use crate::error::*;
-use crate::record::Record;
+use crate::models::tablepage::*;
+use crate::models::error::SQLCommandError;
+use crate::models::record::Record;
+use crate::models::schema::*;
 
 pub fn dbinfo(schema_data: &SchemaRAW) -> (u16, usize) {
     return (schema_data.page_size, schema_data.cells.len());
