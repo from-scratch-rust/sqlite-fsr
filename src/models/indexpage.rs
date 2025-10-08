@@ -1,6 +1,3 @@
-
-
-
 struct LeafIndexPage {
     pub header: [u8; 8],
     pub cells: Vec<Vec<u8>>

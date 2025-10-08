@@ -1,7 +1,6 @@
 pub mod utils;
 pub mod models;
 pub mod command;
-pub mod indexpage;
 
 use std::fs::File;
 use std::path::PathBuf;
