@@ -175,18 +175,18 @@ impl Table for InteriorTablePage<'_> {
             self.file.read_exact(&mut page_buffer);
 
             let mut table_page: TablePage = match page_buffer[0] {
-                                    0x0D => TablePage::Leaf(LeafTablePage::from_bytes(&page_buffer)),
-                                    0x05 => TablePage::Interior(InteriorTablePage::from_bytes(&page_buffer, self.file)),
-                                    0x0a => {
-                                        println!("index b-tree leaf page type not supported");
-                                        continue;
-                                    },
-                                    0x02 => {
-                                        println!("index b-tree interior page type not supported");
-                                        continue;
-                                    },
-                                    e => panic!("unsupported page type {}", e),
-                                };
+                                                0x0D => TablePage::Leaf(LeafTablePage::from_bytes(&page_buffer)),
+                                                0x05 => TablePage::Interior(InteriorTablePage::from_bytes(&page_buffer, self.file)),
+                                                0x0a => {
+                                                    println!("index b-tree leaf page type not supported");
+                                                    continue;
+                                                },
+                                                0x02 => {
+                                                    println!("index b-tree interior page type not supported");
+                                                    continue;
+                                                },
+                                                e => panic!("unsupported page type {}", e),
+                                            };
             let table_rows = table_page.to_table_rows();
             tblrowcount += table_rows.len();
             // println!("tblrowcount: {}", tblrowcount);
@@ -203,12 +203,12 @@ impl Table for InteriorTablePage<'_> {
                 self.file.seek(SeekFrom::Start(start));
                 self.file.read_exact(&mut sibling_page_buffer);
                 let mut sibling_tablepage: Option<TablePage> = match sibling_page_buffer[0] {
-                                                                0x0D => Some(TablePage::Leaf(LeafTablePage::from_bytes(&sibling_page_buffer))),
-                                                                0x05 => Some(TablePage::Interior(InteriorTablePage::from_bytes(&sibling_page_buffer, self.file))),
-                                                                0x0a => None,
-                                                                0x02 => None,
-                                                                _    => panic!("unsupported page type"),
-                                                            };
+                                                                    0x0D => Some(TablePage::Leaf(LeafTablePage::from_bytes(&sibling_page_buffer))),
+                                                                    0x05 => Some(TablePage::Interior(InteriorTablePage::from_bytes(&sibling_page_buffer, self.file))),
+                                                                    0x0a => None,
+                                                                    0x02 => None,
+                                                                    _    => panic!("unsupported page type"),
+                                                                };
                 if sibling_tablepage.is_some() {
                     let sibling_tablepage_rows = sibling_tablepage.unwrap().to_table_rows();
                     result.extend(sibling_tablepage_rows);
