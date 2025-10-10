@@ -1,6 +1,5 @@
-use crate::utils::varint::{parse_varint};
-use std::io::{Read, Seek, SeekFrom};
-
+use crate::models::schema::SchemaRow;
+use crate::utils::varint::parse_varint;
 
 pub struct SchemaRAW {
     pub page_size: u16,
@@ -10,15 +9,6 @@ pub struct SchemaRAW {
     pub cells: Vec<Vec<u8>>
 }
 
-
-#[derive(Debug)]
-pub struct SchemaRow {
-    pub object_type: String,    // "table", "index", etc.
-    pub name: String,           // object name
-    pub table_name: String,     // table the object belongs to
-    pub rootpage: i8,           // root b-tree page number
-    pub sql: String,            // CREATE statement
-}
 
 impl SchemaRAW {
     pub fn from_bytes(data: &[u8]) -> Self {
@@ -111,20 +101,4 @@ impl SchemaRAW {
         }
         return header_entries;
     }
-}
-
-
-pub fn extract_raw_schema_data<R: Read + Seek>(file: &mut R) -> SchemaRAW {
-    // Read the 2-byte page size at offset 16
-    let mut page_size_buffer = [0u8; 2];
-    file.seek(SeekFrom::Start(16)).expect("seek failed");
-    file.read_exact(&mut page_size_buffer).expect("failed to read page size");
-    let page_size = u16::from_be_bytes(page_size_buffer);
-
-    // Read the full schema page
-    let mut schema_raw_buffer = vec![0; page_size as usize];
-    file.seek(SeekFrom::Start(0)).expect("seek failed");
-    file.read_exact(&mut schema_raw_buffer).expect("failed to read schema page");
-
-    SchemaRAW::from_bytes(&schema_raw_buffer)
 }

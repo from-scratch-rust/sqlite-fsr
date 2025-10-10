@@ -16,10 +16,9 @@ pub enum CommandArgsError {
 pub enum SQLCommandError {
     #[error("No table named \"{0}\" found")]
     UnknownTable(String),
-
+    
     #[error("SQL Command: \"{0}\" is not supported.")]
     UnsupportedCommand(String)
-
 }
 
 #[derive(Debug, thiserror::Error)]
