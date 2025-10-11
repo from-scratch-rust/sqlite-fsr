@@ -10,7 +10,7 @@ use crate::models::schema::*;
 use crate::command::tables;
 use crate::command::dbinfo;
 use crate::command::sql;
-
+use crate::models::DBFile;
 
 pub fn run(args: &[String]) -> Result<String, RunError> {
     if args.len() <= 1 {
@@ -26,15 +26,15 @@ pub fn run(args: &[String]) -> Result<String, RunError> {
                                 .split(" ")
                                 .collect();
     
-    let mut file = match File::open(db_path) {
+    let mut file = match DBFile::open(db_path) {
                         Ok(file) => file,
                         Err(e) => return Err(CommandArgsError::Io(e))?
                     };
 
-    let raw_schema = extract_raw_schema_data(&mut file);
+    let raw_schema = &file.schema;
     let output = match command[0] {
                         ".dbinfo" => {
-                            let (page_size, table_count) = dbinfo::get_dbinfo(&raw_schema);
+                            let (page_size, table_count) = dbinfo::get_dbinfo(raw_schema);
                             Ok(format!(
                                 "database page size: {}\nnumber of tables: {}",
                                 page_size, table_count
@@ -45,7 +45,7 @@ pub fn run(args: &[String]) -> Result<String, RunError> {
                             Ok(format!("{}", tables.join(" ")))
                         }
                         "SELECT" => {
-                            let result = sql::execute(command, &raw_schema, &mut file);
+                            let result = sql::execute(command, &mut file);
                             match result {
                                 Ok(rows) => Ok(format!("{}", rows.len())),
                                 Err(e) => Err(e)?
