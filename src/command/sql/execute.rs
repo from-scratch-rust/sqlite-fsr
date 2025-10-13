@@ -1,4 +1,3 @@
-use std::fs::File;
 use crate::models::{schema::*, DBFile};
 use crate::models::error::SQLCommandError;
 use crate::models::record::Record;
@@ -11,7 +10,7 @@ pub fn execute(command_components: Vec<&str>, file: &mut DBFile) -> Result<Vec<R
                                                 .to_schema_rows()
                                                 .into_iter()
                                                 .find(|entry| entry.table_name == target_table)
-                                                .ok_or_else(|| SQLCommandError::UnknownTable(target_table.to_string()))?; 
+                                                .ok_or_else(|| SQLCommandError::UnknownTable(target_table.to_string()))?;
 
                                                     
     let result = match command_components[0] {

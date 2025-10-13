@@ -13,7 +13,6 @@ pub struct DBFile {
 impl DBFile {
     pub fn open(path: PathBuf) -> io::Result<Self> {
         let mut file = File::open(path)?;
-        // let page_size = Self::read_page_size(&mut file)?;
         let schema = Self::extract_raw_schema_data(&mut file);
         Ok(Self { file, schema })
     }

@@ -1,12 +1,8 @@
 pub mod utils;
 pub mod models;
 pub mod command;
-
-use std::fs::File;
 use std::path::PathBuf;
-
 use crate::models::error::*;
-use crate::models::schema::*;
 use crate::command::tables;
 use crate::command::dbinfo;
 use crate::command::sql;
