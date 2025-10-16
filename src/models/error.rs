@@ -21,6 +21,12 @@ pub enum SQLCommandError {
     UnsupportedCommand(String)
 }
 
+
+#[derive(Debug)]
+pub enum SQLSyntaxError {
+    UexpectedValue(String)
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum RunError {
     #[error(transparent)]
