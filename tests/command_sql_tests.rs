@@ -1,7 +1,6 @@
 use std::path::PathBuf;
-use std::{fs::File};
-use sqlite_fsr::command::{dbinfo, tables, sql};
-use sqlite_fsr::models::{schema::*, DBFile};
+use sqlite_fsr::command::{sql};
+use sqlite_fsr::models::{DBFile};
 use sqlite_fsr::run;
 
 

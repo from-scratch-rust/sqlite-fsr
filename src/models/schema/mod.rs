@@ -1,5 +1,3 @@
-
-use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 
 pub fn extract_raw_schema_data<R: Read + Seek>(file: &mut R) -> SchemaRAW {
