@@ -51,8 +51,8 @@ impl Tokenize for str {
                                             let identifier = Some(SQLToken::Identifier(component.to_string()));
 
                                             [left_symbol, identifier, right_symbol].into_iter().filter_map(|t| t).collect()
-                                        },
-                                    };
+                                            }
+                                        };
             tokens.append(&mut component_tokens);
         }
         return tokens;
