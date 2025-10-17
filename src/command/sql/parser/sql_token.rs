@@ -31,24 +31,24 @@ impl Tokenize for str {
 
                                             let beginning_character = characters[0];
                                             let left_symbol: Option<SQLToken> = match beginning_character.to_sql_token() {
-                                                SQLToken::Symbol(char) => {
-                                                    component_copy = &component_copy[1..];
-                                                    Some(SQLToken::Symbol(char))
-                                                }
-                                                _ => None
-                                            };
+                                                                                    SQLToken::Symbol(char) => {
+                                                                                        component_copy = &component_copy[1..];
+                                                                                        Some(SQLToken::Symbol(char))
+                                                                                    }
+                                                                                    _ => None
+                                                                                };
 
 
                                             let ending_character = characters[characters.len()-1];
                                             let right_symbol: Option<SQLToken> = match ending_character.to_sql_token() {
-                                                SQLToken::Symbol(char) => {
-                                                    component_copy = &component_copy[..component_copy.len() - 1];
-                                                    Some(SQLToken::Symbol(char))
-                                                }
-                                                _ => None
-                                            };
+                                                                                        SQLToken::Symbol(char) => {
+                                                                                            component_copy = &component_copy[..component_copy.len() - 1];
+                                                                                            Some(SQLToken::Symbol(char))
+                                                                                        }
+                                                                                        _ => None
+                                                                                    };
 
-                                            let identifier = Some(SQLToken::Identifier(component.to_string()));
+                                            let identifier = Some(SQLToken::Identifier(component_copy.to_string()));
 
                                             [left_symbol, identifier, right_symbol].into_iter().filter_map(|t| t).collect()
                                             }

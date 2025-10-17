@@ -22,9 +22,14 @@ pub enum SQLCommandError {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum SQLSyntaxError {
-    UexpectedValue(String)
+    #[error("SQL Syntax Error: Unexpected token \"{0}\".")]
+    UnexpectedToken(String),
+    
+    #[error("SQL Syntax Error: Value is unsupported \"{0}\".")]
+    UnsupportedValue(String)
+
 }
 
 #[derive(Debug, thiserror::Error)]
