@@ -75,10 +75,18 @@ impl SelectStatement {
         tokens_cursor.next_if(|t| matches!(t, SQLToken::Symbol(Symbol::LeftParenthesis)));
         let columns: Option<Vec<String>> = if let Some(SQLToken::Identifier(column)) = tokens_cursor.peek() {
                                                 match column.as_str() {
-                                                    "*" => None,
+                                                    "*" => {
+                                                        tokens_cursor.next();
+                                                        None
+                                                    },
                                                     _ => Self::extract_columns(&mut tokens_cursor)
                                                 }
                                             } else { panic!() };
+
+        tokens_cursor.next_if(|t| matches!(t, SQLToken::Symbol(Symbol::RightParenthesis)));
+
+        if let Some(SQLToken::Keyword(first_word_after_columns)) = tokens_cursor.next() { assert!(first_word_after_columns == "FROM") }
+        else { panic!() }
 
         Self { columns, table_name: String::new(), where_clause: None }
     }
