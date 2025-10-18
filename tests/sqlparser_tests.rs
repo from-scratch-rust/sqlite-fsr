@@ -1,4 +1,4 @@
-use sqlite_fsr::command::sql::parser::{sql_statement::{SQLStatement, ToSQLStatement}, sql_token::{Symbol, ToSQLToken, Tokenize}, SQLToken};
+use sqlite_fsr::command::sql::parser::{sql_statement::{SQLStatement, ToSQLStatement}, sql_token::{ Symbol, ToSQLToken, Tokenize}, SQLToken};
 
 #[test]
 fn test_ToSQLToken_converts_string_to_token_correctly() {
@@ -75,11 +75,10 @@ fn test_ToSQLToken_converts_string_to_token_correctly_7() {
     let result = string.tokenize();
 
     assert_eq!(result.len(), 4);
-    // match &result[1] {
-    //     SQLToken::Identifier(identifier) => assert_eq!(identifier, "name"),
-    //     _ => panic!("Expected CreateTable statement"),
-
-    // }
+    match &result[0] {
+        SQLToken::Identifier(identifier) => assert_eq!(identifier, "name"),
+        _ => panic!("Expected CreateTable statement"),
+    }
 }
 
 
@@ -107,6 +106,28 @@ fn test_ToSQLStatement_extracts_tablename_from_CREATE_statement_correctly() {
     let result = string.to_sql_statment().unwrap();
     match result {
         SQLStatement::CreateTable(statement) => assert_eq!(statement.table_name, "users"),
+        _ => panic!("Expected CreateTable statement"),
+    }
+}
+
+
+
+#[test]
+fn test_ToSQLStatement_extracts_columns_from_CREATE_statement_correctly() {
+    let string = "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT);";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::CreateTable(statement) => assert_eq!(statement.columns, vec!["id", "name"]),
+        _ => panic!("Expected CreateTable statement"),
+    }
+}
+
+#[test]
+fn test_ToSQLStatement_extracts_columns_from_CREATE_statement_correctly_2() {
+    let string = "CREATE TABLE users ( id INTEGER PRIMARY KEY, name TEXT );";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::CreateTable(statement) => assert_eq!(statement.columns, vec!["id", "name"]),
         _ => panic!("Expected CreateTable statement"),
     }
 }

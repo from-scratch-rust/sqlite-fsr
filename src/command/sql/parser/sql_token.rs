@@ -25,33 +25,7 @@ impl Tokenize for str {
             let mut component_tokens = match component {
                                         s if (s == "SELECT") | (s == "CREATE") | (s == "FROM") => vec![SQLToken::Keyword((*s).to_string())],
                                         s if s.len() == 1 => vec![s.chars().next().unwrap().to_sql_token()], //this is ugly as hell but rust std doesnt support character indexing🤷🏾‍♂️ 
-                                        _ => {
-                                            let characters: Vec<char> = component.chars().collect(); 
-                                            let mut component_copy = component.trim();
-
-                                            let beginning_character = characters[0];
-                                            let left_symbol: Option<SQLToken> = match beginning_character.to_sql_token() {
-                                                                                    SQLToken::Symbol(char) => {
-                                                                                        component_copy = &component_copy[1..];
-                                                                                        Some(SQLToken::Symbol(char))
-                                                                                    }
-                                                                                    _ => None
-                                                                                };
-
-
-                                            let ending_character = characters[characters.len()-1];
-                                            let right_symbol: Option<SQLToken> = match ending_character.to_sql_token() {
-                                                                                        SQLToken::Symbol(char) => {
-                                                                                            component_copy = &component_copy[..component_copy.len() - 1];
-                                                                                            Some(SQLToken::Symbol(char))
-                                                                                        }
-                                                                                        _ => None
-                                                                                    };
-
-                                            let identifier = Some(SQLToken::Identifier(component_copy.to_string()));
-
-                                            [left_symbol, identifier, right_symbol].into_iter().filter_map(|t| t).collect()
-                                            }
+                                        _ => tokenize_component(component)
                                         };
             tokens.append(&mut component_tokens);
         }
@@ -73,4 +47,53 @@ impl ToSQLToken for char {
                     };
         return token;
     }
+}
+
+pub fn tokenize_component(value: &str) -> Vec<SQLToken> {
+    let mut value_copy = value.trim();
+
+    // consume leading symbol characters
+    let mut left_symbols: Vec<SQLToken> = Vec::new();
+    loop {
+        let first_character = match value_copy.chars().next() {
+            Some(character) => character,
+            None => break,
+        };
+
+        match first_character.to_sql_token() {
+            SQLToken::Symbol(symbol) => {
+                let offset = first_character.len_utf8();
+                value_copy = &value_copy[offset..];
+                left_symbols.push(SQLToken::Symbol(symbol));
+            }
+            _ => break,
+        }
+    }
+
+
+    // consume trailing symbol characters
+    let mut right_symbols: Vec<SQLToken> = Vec::new();
+    loop {
+        let last_character = match value_copy.chars().rev().next() {
+            Some(character) => character,
+            None => break,
+        };
+        match last_character.to_sql_token() {
+            SQLToken::Symbol(symbol) => {
+                let offset = last_character.len_utf8();
+                let new_len = value_copy.len() - offset;
+                value_copy = &value_copy[..new_len];
+                right_symbols.insert(0, SQLToken::Symbol(symbol));
+            }
+            _ => break,
+        }
+    }
+
+
+
+    let mut tokens: Vec<SQLToken> = Vec::new();
+    tokens.extend(left_symbols);
+    if !value_copy.is_empty() {tokens.push(SQLToken::Identifier(value_copy.to_string()))};
+    tokens.extend(right_symbols);
+    return tokens
 }

@@ -42,7 +42,7 @@ impl CreateTableStatement {
                 let mut column_defintion_components: Vec<String> = Vec::new();
 
                 loop {
-                    let token = tokens_iterator.next();
+                    let token = tokens_iterator.next_if(|t| !matches!(t, SQLToken::Symbol(Symbol::RightParenthesis)));
                     match token {
                         Some(SQLToken::Identifier(column_defintion_component)) => column_defintion_components.push(column_defintion_component.to_string()),
                         Some(SQLToken::Symbol(Symbol::Comma)) => { /* comma consumed, break to next column */ break; }
