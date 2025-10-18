@@ -81,8 +81,6 @@ fn test_ToSQLToken_converts_string_to_token_correctly_7() {
     }
 }
 
-
-
 #[test]
 fn test_ToSQLStatement_converts_string_to_statement_correct_1() {
     let string = "SELECT (name, age, weight) FROM people;";
@@ -128,6 +126,30 @@ fn test_ToSQLStatement_extracts_columns_from_CREATE_statement_correctly_2() {
     let result = string.to_sql_statment().unwrap();
     match result {
         SQLStatement::CreateTable(statement) => assert_eq!(statement.columns, vec!["id", "name"]),
+        _ => panic!("Expected CreateTable statement"),
+    }
+}
+
+
+#[test]
+fn test_ToSQLStatement_extracts_columns_from_SELECT_statement_correctly() {
+    let string = "SELECT (name, age, weight) FROM people;";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::Select(statement) => match statement.columns {
+                                                Some(columns) => assert_eq!(columns, vec!["name", "age", "weight"]),
+                                                None => panic!("Columns not properly extracted from SELECT statment")
+                                            },
+        _ => panic!("Expected CreateTable statement"),
+    }
+}
+
+#[test]
+fn test_ToSQLStatement_extracts_columns_from_SELECT_statement_correctly_2() {
+    let string = "SELECT * FROM people;";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::Select(statement) => assert_eq!(statement.columns, None),
         _ => panic!("Expected CreateTable statement"),
     }
 }

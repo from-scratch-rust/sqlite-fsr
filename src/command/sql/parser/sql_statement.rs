@@ -60,9 +60,48 @@ impl CreateTableStatement {
 }
 
 pub struct SelectStatement {
-    pub columns: Vec<String>,
+    pub columns: Option<Vec<String>>,
     pub table_name: String,
     pub where_clause: Option<Condition>
+}
+
+impl SelectStatement {
+    pub fn from_tokens(tokens: Vec<SQLToken>) -> Self {
+        let mut tokens_cursor = tokens.into_iter().peekable();
+
+        if let Some(SQLToken::Keyword(first_word)) = tokens_cursor.nth(0) { assert!(first_word == "SELECT") }
+        else { panic!() }
+                
+        tokens_cursor.next_if(|t| matches!(t, SQLToken::Symbol(Symbol::LeftParenthesis)));
+        let columns: Option<Vec<String>> = if let Some(SQLToken::Identifier(column)) = tokens_cursor.peek() {
+                                                match column.as_str() {
+                                                    "*" => None,
+                                                    _ => Self::extract_columns(&mut tokens_cursor)
+                                                }
+                                            } else { panic!() };
+
+        Self { columns, table_name: String::new(), where_clause: None }
+    }
+
+    fn extract_columns(tokens_iterator: &mut Peekable<std::vec::IntoIter<SQLToken>>) -> Option<Vec<String>> {
+        let mut columns: Vec<String> = Vec::new();
+        while !matches!(tokens_iterator.peek(), Some(&SQLToken::Symbol(Symbol::RightParenthesis))) & !matches!(tokens_iterator.peek(), None) {
+
+            let token = tokens_iterator.next();
+            match token {
+                Some(SQLToken::Identifier(column)) => columns.push(column),
+                Some(SQLToken::Symbol(Symbol::Comma)) => continue,
+                Some(SQLToken::Symbol(Symbol::RightParenthesis)) => break,
+                _ => panic!()
+            }
+            
+        }
+
+        match columns.len() {
+            0 => return None,
+            _ => return Some(columns)
+        }
+    }
 }
 
 pub struct Condition {
@@ -84,7 +123,7 @@ impl ToSQLStatement for &str {
                             
         match &tokens[0] {
             SQLToken::Keyword(s) if s == "CREATE" => Ok(SQLStatement::CreateTable(CreateTableStatement::from_tokens(tokens))),
-            SQLToken::Keyword(s) if s == "SELECT" => Ok(SQLStatement::Select(SelectStatement {columns: Vec::new(), table_name: String::new(), where_clause: None})),            
+            SQLToken::Keyword(s) if s == "SELECT" => Ok(SQLStatement::Select(SelectStatement::from_tokens(tokens))),            
             _ => Err(SQLSyntaxError::UnexpectedToken(String::new()))
         }
     }
