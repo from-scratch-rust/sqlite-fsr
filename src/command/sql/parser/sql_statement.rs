@@ -88,7 +88,12 @@ impl SelectStatement {
         if let Some(SQLToken::Keyword(first_word_after_columns)) = tokens_cursor.next() { assert!(first_word_after_columns == "FROM") }
         else { panic!() }
 
-        Self { columns, table_name: String::new(), where_clause: None }
+        let table_name = match tokens_cursor.next() {
+                            Some(SQLToken::Identifier(tablename)) => tablename,
+                            _ => panic!()
+                         };
+
+        Self { columns, table_name, where_clause: None }
     }
 
     fn extract_columns(tokens_iterator: &mut Peekable<std::vec::IntoIter<SQLToken>>) -> Option<Vec<String>> {

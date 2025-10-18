@@ -130,6 +130,27 @@ fn test_ToSQLStatement_extracts_columns_from_CREATE_statement_correctly_2() {
     }
 }
 
+#[test]
+fn test_ToSQLStatement_extracts_tablename_from_SELECT_statement_correctly() {
+    let string = "SELECT (name, age, weight) FROM people;";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::Select(statement) => assert_eq!(statement.table_name, "people"),
+        _ => panic!("Expected SELECT statement"),
+    }
+}
+
+#[test]
+fn test_ToSQLStatement_extracts_tablename_from_SELECT_statement_correctly_2() {
+    let string = "SELECT ( region, type ) FROM datacenters;";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::Select(statement) => assert_eq!(statement.table_name, "datacenters"),
+        _ => panic!("Expected SELECT statement"),
+    }
+}
+
+
 
 #[test]
 fn test_ToSQLStatement_extracts_columns_from_SELECT_statement_correctly() {
