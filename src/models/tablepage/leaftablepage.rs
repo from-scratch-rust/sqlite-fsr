@@ -1,3 +1,4 @@
+use crate::command::sql::parser::sql_statement::SelectStatement;
 use crate::utils::varint::parse_varint;
 use crate::models::record::Record;
 use crate::models::tablepage::Table;
@@ -44,7 +45,7 @@ impl LeafTablePage {
 
 impl Table for LeafTablePage {
 
-    fn to_table_rows(&mut self) -> Vec<Record> {
+    fn to_table_rows(&mut self, statement: &SelectStatement) -> Vec<Record> {
         let mut table_rows: Vec<Record> = Vec::new();
         for cells_index in 0..self.cells.len() {
             let cell = &self.cells[cells_index];

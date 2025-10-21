@@ -1,12 +1,13 @@
 
 use std::fs::File;
 use std::io::{SeekFrom, Seek, Read};
+use crate::command::sql::parser::sql_statement::SelectStatement;
 use crate::models::{schema::*, DBFile};
 use crate::models::tablepage::*;
 use crate::models::record::Record;
 
 
-pub fn select(command_components: Vec<&str>, entry: &SchemaRow, file: &mut DBFile) -> Vec<Record> {
+pub fn select(statement: SelectStatement, entry: &SchemaRow, file: &mut DBFile) -> Vec<Record> {
     let page_size = file.schema.page_size;
     file.seek(SeekFrom::Start(page_size as u64 * (entry.rootpage-1)  as u64)).expect("seek failed");
     let mut table_page_buf = vec![0; file.schema.page_size as usize];
@@ -16,6 +17,6 @@ pub fn select(command_components: Vec<&str>, entry: &SchemaRow, file: &mut DBFil
                                         0x05 => TablePage::Interior(InteriorTablePage::from_bytes(&table_page_buf, file)),
                                         _    => panic!("unsupported page type"),
                                     };
-    let table_rows = table_page.to_table_rows();
+    let table_rows = table_page.to_table_rows(&statement);
     return table_rows;
 }

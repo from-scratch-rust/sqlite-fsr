@@ -82,6 +82,19 @@ fn test_ToSQLToken_converts_string_to_token_correctly_7() {
 }
 
 #[test]
+fn test_ToSQLToken_converts_string_to_token_correctly_8() {
+    let string = "sqlite_sequence(name,seq";
+    let result = string.tokenize();
+
+    assert_eq!(result.len(), 5);
+    match &result[1] {
+        SQLToken::Identifier(identifier) => assert_eq!(identifier, "sqlite_sequence"),
+        _ => panic!("Expected CreateTable statement"),
+
+    }
+}
+
+#[test]
 fn test_ToSQLStatement_converts_string_to_statement_correct_1() {
     let string = "SELECT (name, age, weight) FROM people;";
     let result = string.to_sql_statment().unwrap();
@@ -104,6 +117,16 @@ fn test_ToSQLStatement_extracts_tablename_from_CREATE_statement_correctly() {
     let result = string.to_sql_statment().unwrap();
     match result {
         SQLStatement::CreateTable(statement) => assert_eq!(statement.table_name, "users"),
+        _ => panic!("Expected CreateTable statement"),
+    }
+}
+
+#[test]
+fn test_ToSQLStatement_extracts_tablename_from_CREATE_statement_correctly_2() {
+    let string = "CREATE TABLE apples\n( \nid integer primary key autoincrement, \nname text, \ncolor text\n)";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::CreateTable(statement) => assert_eq!(statement.table_name, "apples"),
         _ => panic!("Expected CreateTable statement"),
     }
 }

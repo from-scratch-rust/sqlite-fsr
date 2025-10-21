@@ -8,6 +8,7 @@ pub enum SQLStatement {
     CreateTable(CreateTableStatement),
 }
 
+#[derive(Debug)]
 pub struct CreateTableStatement {
     pub table_name: String,
     pub columns: Vec<String>

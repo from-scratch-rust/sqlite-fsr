@@ -1,3 +1,5 @@
+use crate::command::sql::parser::sql_statement::CreateTableStatement;
+use crate::command::sql::parser::sql_token::Tokenize;
 use crate::models::schema::SchemaRow;
 use crate::utils::varint::parse_varint;
 
@@ -29,9 +31,18 @@ impl SchemaRAW {
         let mut cells: Vec<Vec<u8>> = Vec::new();
         for index in 0..cell_pointer_array.len() {
             let cell_pointer = cell_pointer_array[index] as usize;
-            let (cell_size, _) = parse_varint(&data[cell_pointer..cell_pointer+9]);
-            // Slice out the cell
-            let cell_end = cell_pointer + cell_size as usize;
+            let mut offset = cell_pointer;
+            // Parse payload size varint
+            let (payload_size, len1) = parse_varint(&data[offset..]);
+            offset += len1;
+
+            // Parse rowid varint
+            let (_rowid, len2) = parse_varint(&data[offset..]);
+            offset += len2;
+
+            // Now offset points to start of payload
+            let cell_end = offset + payload_size as usize;
+
             let cell = data[cell_pointer..cell_end].to_vec();
             cells.push(cell);
         }
@@ -94,7 +105,9 @@ impl SchemaRAW {
 
             record_body_offset = record_body_offset+record_header_value_sizes[4] as usize;
             let sql_bytes = record_body[record_body_offset..].to_vec();
-            let sql = String::from_utf8(sql_bytes).unwrap();
+            let sql_string = String::from_utf8(sql_bytes).unwrap();
+            print!("sql_string: {}", sql_string);
+            let sql = CreateTableStatement::from_tokens(sql_string.tokenize());
 
             let schemarow_header = SchemaRow { object_type, name, table_name, rootpage, sql };
             header_entries.push(schemarow_header);        

@@ -1,30 +1,28 @@
 pub fn parse_varint(bytes: &[u8]) -> (i64, usize) {
-    let mut value: i64 = 0;
+    let mut value: u64 = 0;  // Use u64 to avoid premature sign extension
     let mut len = 0;
-
+    
     for &byte in bytes.iter().take(9) {
-        value = (value << 7) | (byte & 0x7F) as i64;
         len += 1;
-
-        if byte & 0x80 == 0 {
-            return (value, len);
+        
+        if len == 9 {
+            // 9th byte uses all 8 bits
+            value = (value << 8) | (byte as u64);
+            return (value as i64, len);
+        } else {
+            // First 8 bytes use lower 7 bits
+            value = (value << 7) | ((byte & 0x7F) as u64);
+            
+            if byte & 0x80 == 0 {
+                // High bit is 0, we're done
+                return (value as i64, len);
+            }
         }
     }
-
-    // If it's at least 9 bytes, SQLite says it's a full 64-bit integer
-    if bytes.len() >= 9 {
-        let mut v: i64 = 0;
-        for &b in &bytes[..9] {
-            v = (v << 8) | (b as i64);
-        }
-        return (v, 9);
-    }
-
-    // Fallback: if slice < 9 and all bytes had high bit set,
-    // just return what we have
-    (value, len)
+    
+    // Should not reach here if bytes.len() >= 9
+    (value as i64, len)
 }
-
 
 pub fn encode_varint(mut value: i64) -> Vec<u8> {
     let mut varint_bytes = Vec::new();
