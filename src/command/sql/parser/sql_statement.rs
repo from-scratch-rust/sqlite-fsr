@@ -99,7 +99,10 @@ impl SelectStatement {
 
     fn extract_columns(tokens_iterator: &mut Peekable<std::vec::IntoIter<SQLToken>>) -> Option<Vec<String>> {
         let mut columns: Vec<String> = Vec::new();
-        while !matches!(tokens_iterator.peek(), Some(&SQLToken::Symbol(Symbol::RightParenthesis))) & !matches!(tokens_iterator.peek(), None) {
+
+        while !matches!(tokens_iterator.peek(), Some(&SQLToken::Symbol(Symbol::RightParenthesis)))
+        & !matches!(tokens_iterator.peek(), Some(&SQLToken::Keyword(_))) 
+        & !matches!(tokens_iterator.peek(), None) {
 
             let token = tokens_iterator.next();
             match token {
@@ -124,7 +127,6 @@ pub struct Condition {
     pub right: String
 }
 
-
 pub trait ToSQLStatement {
     fn to_sql_statment(&self) -> Result<SQLStatement, SQLSyntaxError>;
 }
@@ -132,8 +134,6 @@ pub trait ToSQLStatement {
 impl ToSQLStatement for &str {
     fn to_sql_statment(&self) -> Result<SQLStatement, SQLSyntaxError> {
         let tokens: Vec<SQLToken> = self.tokenize();
-
-
                             
         match &tokens[0] {
             SQLToken::Keyword(s) if s == "CREATE" => Ok(SQLStatement::CreateTable(CreateTableStatement::from_tokens(tokens))),

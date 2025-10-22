@@ -87,7 +87,7 @@ fn test_ToSQLToken_converts_string_to_token_correctly_8() {
     let result = string.tokenize();
 
     assert_eq!(result.len(), 5);
-    match &result[1] {
+    match &result[0] {
         SQLToken::Identifier(identifier) => assert_eq!(identifier, "sqlite_sequence"),
         _ => panic!("Expected CreateTable statement"),
 
