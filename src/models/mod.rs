@@ -5,3 +5,4 @@ pub mod schema;
 pub mod tablepage;
 pub mod dbfile;
 pub use dbfile::DBFile;
+pub mod table;

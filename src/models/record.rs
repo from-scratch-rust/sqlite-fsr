@@ -9,7 +9,7 @@ pub struct Record {
 
 impl fmt::Display for Record {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.row_id);
+        // write!(f, "{}", self.row_id);
         for i in 0..self.column_headers.len() {
             let value_size = self.column_headers[i] as usize;
             let value = if value_size == 0 { 
@@ -17,7 +17,7 @@ impl fmt::Display for Record {
                         } else {
                             self.column_values[i].iter().map(|&c| c as char).collect::<String>()
                         };
-            write!(f, " {}", value);
+            write!(f, "{}", value);
         }
         write!(f, "")
     } 

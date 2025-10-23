@@ -17,6 +17,6 @@ pub fn select(statement: SelectStatement, entry: &SchemaRow, file: &mut DBFile) 
                                         0x05 => TablePage::Interior(InteriorTablePage::from_bytes(&table_page_buf, file)),
                                         _    => panic!("unsupported page type"),
                                     };
-    let table_rows = table_page.to_table_rows(&statement);
+    let table_rows = table_page.to_table_rows(&statement, &entry.sql);
     return table_rows;
 }

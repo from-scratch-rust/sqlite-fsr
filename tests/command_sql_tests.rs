@@ -52,6 +52,8 @@ fn test_SELECT_sql_command_returns_correct_values() {
 }
 
 
+
+
 #[test]
 fn test_COUNT_sql_command_returns_error_when_table_not_found() {
     let mut file = DBFile::open(PathBuf::from("./sample.db")).unwrap();

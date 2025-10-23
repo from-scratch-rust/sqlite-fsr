@@ -28,9 +28,10 @@ impl CreateTableStatement {
         else { panic!(); }
 
         let columns_defintions = Self::extract_column_definitions(&mut tokens_cursor);
-        let columns = columns_defintions.iter()
-                        .map(|column_defintion| column_defintion[0].clone())
-                        .collect();
+        let mut columns: Vec<String> = columns_defintions.iter()
+                                        .map(|column_defintion| column_defintion[0].clone())
+                                        .collect();
+        
 
         Self { table_name, columns }
     }
