@@ -197,3 +197,14 @@ fn test_ToSQLStatement_extracts_columns_from_SELECT_statement_correctly_2() {
         _ => panic!("Expected CreateTable statement"),
     }
 }
+
+
+#[test]
+fn test_TOSQLStatement_detects_INTEGER_PRIMARY_KEY_column() {
+    let string = "CREATE TABLE apples (id integer primary key autoincrement, name text, color text)";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::CreateTable(statement) => assert!(statement.integer_primary_key_column.is_some()),
+        _ => panic!("Expected CreateTable statement")
+    }
+}

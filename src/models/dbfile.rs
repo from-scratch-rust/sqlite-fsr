@@ -2,9 +2,12 @@ use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 use std::path::PathBuf;
 use crate::models::schema::SchemaRAW;
+use crate::models::table::DBTable;
 use std::ops::Deref;
 use std::ops::DerefMut;
 use std::io;
+use crate::SQLCommandError;
+
 pub struct DBFile {
     pub file: File,
     pub schema: SchemaRAW
@@ -32,6 +35,14 @@ impl DBFile {
 
         SchemaRAW::from_bytes(&schema_raw_buffer)
     }
+
+    // fn get_table(self, table_name: String) -> DBTable {
+    //     let target_table_schema_entry: SchemaRow = self.schema
+    //                                                 .to_schema_rows()
+    //                                                 .into_iter()
+    //                                                 .find(|entry| entry.table_name == table_name)
+    //                                                 .ok_or_else(|| SQLCommandError::UnknownTable(table_name))?;
+    // }
 }
 
 impl Deref for DBFile {

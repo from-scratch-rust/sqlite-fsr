@@ -11,7 +11,8 @@ pub enum SQLStatement {
 #[derive(Debug)]
 pub struct CreateTableStatement {
     pub table_name: String,
-    pub columns: Vec<String>
+    pub columns: Vec<String>,
+    pub integer_primary_key_column: Option<usize>
 }
 
 impl CreateTableStatement {
@@ -28,12 +29,13 @@ impl CreateTableStatement {
         else { panic!(); }
 
         let columns_defintions = Self::extract_column_definitions(&mut tokens_cursor);
+        let integer_primary_key_column = columns_defintions.iter().position(|column_definition| {column_definition.len() >= 4 && (column_definition[1].to_uppercase() == "INTEGER" && column_definition[2].to_uppercase() == "PRIMARY" && column_definition[3].to_uppercase() == "KEY") } );
         let mut columns: Vec<String> = columns_defintions.iter()
                                         .map(|column_defintion| column_defintion[0].clone())
                                         .collect();
         
 
-        Self { table_name, columns }
+        Self { table_name, columns, integer_primary_key_column }
     }
 
     fn extract_column_definitions(tokens_iterator: &mut Peekable<std::vec::IntoIter<SQLToken>>) -> Vec<Vec<String>> {
@@ -47,14 +49,14 @@ impl CreateTableStatement {
                     let token = tokens_iterator.next_if(|t| !matches!(t, SQLToken::Symbol(Symbol::RightParenthesis)));
                     match token {
                         Some(SQLToken::Identifier(column_defintion_component)) => column_defintion_components.push(column_defintion_component.to_string()),
-                        Some(SQLToken::Symbol(Symbol::Comma)) => { /* comma consumed, break to next column */ break; }
+                        Some(SQLToken::Symbol(Symbol::Comma)) => { break; }
                         _ => break
                     }
                 }
                 column_definitions.push(column_defintion_components);
             }
 
-        }else { panic!() }
+        } else { panic!() }
 
         return column_definitions;
     }

@@ -1,4 +1,4 @@
-use crate::command::sql::parser::sql_statement::{SQLStatement, SelectStatement, ToSQLStatement};
+use crate::command::sql::parser::sql_statement::{SQLStatement, ToSQLStatement};
 use crate::models::{schema::*, DBFile};
 use crate::models::error::SQLCommandError;
 use crate::models::record::Record;

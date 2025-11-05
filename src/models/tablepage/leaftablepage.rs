@@ -59,8 +59,10 @@ impl Table for LeafTablePage {
             
             let record_body: &[u8] = &record_data[record_header_size..];
             let mut column_values = Self::extract_record_column_values(&column_value_sizes, record_body_size, record_body);
-
-        
+            if let Some(integer_id_column_index) = table_description.integer_primary_key_column {
+                column_value_sizes[integer_id_column_index] = row_id_varint_size as i64;
+                column_values[integer_id_column_index] = row_id.to_string().as_bytes().to_vec()
+            }
 
             let column_descriptions: Vec<(&String, &i64)> = table_description.columns.iter().zip(column_value_sizes.iter()).collect();
             let mut column_descriptions_with_values: Vec<_>  = column_descriptions.iter().zip(column_values.iter()).collect();

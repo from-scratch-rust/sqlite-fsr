@@ -51,6 +51,32 @@ fn test_SELECT_sql_command_returns_correct_values() {
     assert_eq!(result, vec!["Granny Smith", "Fuji", "Honeycrisp", "Golden Delicious"]);
 }
 
+#[test]
+fn test_SELECT_sql_command_returns_correct_values_2() {
+    let mut file = DBFile::open(PathBuf::from("./sample.db")).unwrap();
+    let result: Vec<String> = sql::execute("SELECT name, color FROM apples", &mut file)
+                                .unwrap()
+                                .iter()
+                                .map(|record| record.to_string())
+                                .collect();
+                
+    assert_eq!(result, vec!["Granny Smith Light Green", "Fuji Red", "Honeycrisp Blush Red", "Golden Delicious Yellow"]);
+}
+
+
+
+#[test]
+fn test_SELECT_sql_command_returns_correct_values_3() {
+    let mut file = DBFile::open(PathBuf::from("./sample.db")).unwrap();
+    let result: Vec<String> = sql::execute("SELECT * FROM apples", &mut file)
+                                .unwrap()
+                                .iter()
+                                .map(|record| record.to_string())
+                                .collect();
+                
+    assert_eq!(result, vec!["1 Granny Smith Light Green", "2 Fuji Red", "3 Honeycrisp Blush Red", "4 Golden Delicious Yellow"]);
+}
+
 
 
 
