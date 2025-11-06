@@ -88,6 +88,7 @@ fn test_COUNT_sql_command_returns_error_when_table_not_found() {
 }
 
 
+
 #[test]
 fn test_sql_command_returns_error_when_command_not_supported() {
     let mut file = DBFile::open(PathBuf::from("./sample.db")).unwrap();

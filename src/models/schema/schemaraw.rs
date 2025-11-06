@@ -2,6 +2,7 @@ use crate::command::sql::parser::sql_statement::CreateTableStatement;
 use crate::command::sql::parser::sql_token::Tokenize;
 use crate::models::schema::SchemaRow;
 use crate::utils::varint::parse_varint;
+use crate::sql::parser::SQLToken;
 
 pub struct SchemaRAW {
     pub page_size: u16,
@@ -107,7 +108,16 @@ impl SchemaRAW {
             let sql_bytes = record_body[record_body_offset..].to_vec();
             let sql_string = String::from_utf8(sql_bytes).unwrap();
             print!("sql_string: {}", sql_string);
-            let sql = CreateTableStatement::from_tokens(sql_string.tokenize());
+            let sql_string_tokens = sql_string.tokenize();
+            let sql = if let SQLToken::Identifier(token) = &sql_string_tokens[1] {
+                            match token.as_str() {
+                                "TABLE" => CreateTableStatement::from_tokens(sql_string_tokens),
+                                "INDEX" => todo!("Add struct for CREATE INDEX statement"),
+                                _ => panic!()
+                            }
+                       } else { panic!() };
+
+            // let sql = CreateTableStatement::from_tokens(sql_string.tokenize());
 
             let schemarow_header = SchemaRow { object_type, name, table_name, rootpage, sql };
             header_entries.push(schemarow_header);        

@@ -1,4 +1,4 @@
-use sqlite_fsr::command::sql::parser::{sql_statement::{SQLStatement, ToSQLStatement}, sql_token::{ Symbol, ToSQLToken, Tokenize}, SQLToken};
+use sqlite_fsr::command::sql::parser::{sql_statement::{SQLStatement, ToSQLStatement, AggregatorFunction}, sql_token::{ Symbol, ToSQLToken, Tokenize}, SQLToken};
 
 #[test]
 fn test_ToSQLToken_converts_string_to_token_correctly() {
@@ -197,6 +197,17 @@ fn test_ToSQLStatement_extracts_columns_from_SELECT_statement_correctly_2() {
         _ => panic!("Expected CreateTable statement"),
     }
 }
+
+#[test]
+fn test_ToSQLStatement_extracts_aggregator_function_correctly() {
+    let string = "SELECT COUNT(*) FROM apples";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::Select(statement) => assert_eq!(statement.aggregator_function, Some(AggregatorFunction::COUNT)),
+        _ => panic!()
+    }
+}
+
 
 
 #[test]

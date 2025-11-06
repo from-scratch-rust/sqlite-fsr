@@ -64,9 +64,21 @@ impl CreateTableStatement {
 }
 
 pub struct SelectStatement {
-    pub columns: Option<Vec<String>>,
     pub table_name: String,
-    pub where_clause: Option<Condition>
+    pub columns: Option<Vec<String>>,
+    pub where_clause: Option<Condition>,
+    pub aggregator_function: Option<AggregatorFunction>
+}
+pub struct Condition {
+    pub left: String,
+    pub operator: String,
+    pub right: String
+}
+
+#[derive(Debug, PartialEq)]
+pub enum AggregatorFunction {
+    COUNT,
+    SUM
 }
 
 impl SelectStatement {
@@ -76,9 +88,25 @@ impl SelectStatement {
         if let Some(SQLToken::Keyword(first_word)) = tokens_cursor.nth(0) { assert!(first_word == "SELECT") }
         else { panic!() }
                 
+
+        let aggregator_function = if let Some(SQLToken::Identifier(token)) = tokens_cursor.peek() {
+                                        match token.as_str() {
+                                            "COUNT" => {
+                                                tokens_cursor.next();
+                                                Some(AggregatorFunction::COUNT)
+                                            },
+                                            "SUM" => {
+                                                tokens_cursor.next();
+                                                Some(AggregatorFunction::SUM)
+                                            },
+                                            _ => None
+                                        }                
+                                  } else { panic!("Was expecting Indetifier token.") };
+
         tokens_cursor.next_if(|t| matches!(t, SQLToken::Symbol(Symbol::LeftParenthesis)));
-        let columns: Option<Vec<String>> = if let Some(SQLToken::Identifier(column)) = tokens_cursor.peek() {
-                                                match column.as_str() {
+
+        let columns: Option<Vec<String>> = if let Some(SQLToken::Identifier(token)) = tokens_cursor.peek() {
+                                                match token.as_str() {
                                                     "*" => {
                                                         tokens_cursor.next();
                                                         None
@@ -97,7 +125,7 @@ impl SelectStatement {
                             _ => panic!()
                          };
 
-        Self { columns, table_name, where_clause: None }
+        Self { columns, table_name, where_clause: None, aggregator_function }
     }
 
     fn extract_columns(tokens_iterator: &mut Peekable<std::vec::IntoIter<SQLToken>>) -> Option<Vec<String>> {
@@ -124,11 +152,7 @@ impl SelectStatement {
     }
 }
 
-pub struct Condition {
-    pub left: String,
-    pub operator: String,
-    pub right: String
-}
+
 
 pub trait ToSQLStatement {
     fn to_sql_statment(&self) -> Result<SQLStatement, SQLSyntaxError>;
