@@ -13,6 +13,25 @@ pub enum Symbol {
     Semicolon
 }
 
+impl Symbol {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Symbol::LeftParenthesis => "(",
+            Symbol::RightParenthesis => ")",
+            Symbol::Comma => ",",
+            Symbol::Semicolon => ";"
+        }
+    }
+
+    pub const ALL: [Symbol; 4] = [
+        Symbol::LeftParenthesis,
+        Symbol::RightParenthesis,
+        Symbol::Comma,
+        Symbol::Semicolon,
+    ];
+}
+
+
 
 pub trait Tokenize {
     fn tokenize(&self) -> Vec<SQLToken>;
@@ -20,38 +39,13 @@ pub trait Tokenize {
 impl Tokenize for str {
     fn tokenize(&self) -> Vec<SQLToken> {
         let mut tokens: Vec<SQLToken> = Vec::new();
-        let components = self.trim().split(" ");
+        let binding = self.trim().replace("\n", " ");
+        let components = binding.split_whitespace();
         for component in components.into_iter() {
             let mut component_tokens = match component {
                                         s if (s == "SELECT") | (s == "CREATE") | (s == "FROM") => vec![SQLToken::Keyword((*s).to_string())],
                                         s if s.len() == 1 => vec![s.chars().next().unwrap().to_sql_token()], //this is ugly as hell but rust std doesnt support character indexing🤷🏾‍♂️ 
-                                        _ => {
-                                            let characters: Vec<char> = component.chars().collect(); 
-                                            let mut component_copy = component.trim();
-
-                                            let beginning_character = characters[0];
-                                            let left_symbol: Option<SQLToken> = match beginning_character.to_sql_token() {
-                                                SQLToken::Symbol(char) => {
-                                                    component_copy = &component_copy[1..];
-                                                    Some(SQLToken::Symbol(char))
-                                                }
-                                                _ => None
-                                            };
-
-
-                                            let ending_character = characters[characters.len()-1];
-                                            let right_symbol: Option<SQLToken> = match ending_character.to_sql_token() {
-                                                SQLToken::Symbol(char) => {
-                                                    component_copy = &component_copy[..component_copy.len() - 1];
-                                                    Some(SQLToken::Symbol(char))
-                                                }
-                                                _ => None
-                                            };
-
-                                            let identifier = Some(SQLToken::Identifier(component.to_string()));
-
-                                            [left_symbol, identifier, right_symbol].into_iter().filter_map(|t| t).collect()
-                                            }
+                                        _ => tokenize_component(component)
                                         };
             tokens.append(&mut component_tokens);
         }
@@ -73,4 +67,30 @@ impl ToSQLToken for char {
                     };
         return token;
     }
+}
+
+pub fn tokenize_component(value: &str) -> Vec<SQLToken> {
+    let mut tokens: Vec<SQLToken> = Vec::new();
+    let mut current = String::new();
+
+    for character in value.chars() {
+        // Check if character is any known symbol
+        if Symbol::ALL.iter().any(|s| s.as_str() == character.to_string()) {
+            if !current.is_empty() {
+                tokens.push(SQLToken::Identifier(current.clone()));
+                current.clear();
+            }
+            tokens.push(character.to_sql_token());
+        } else {
+            current.push(character);
+        }
+    }
+
+    if !current.is_empty() {
+        tokens.push(SQLToken::Identifier(current));
+    }
+
+    
+
+    return tokens
 }

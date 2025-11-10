@@ -1,4 +1,4 @@
-use sqlite_fsr::command::sql::parser::{sql_statement::{SQLStatement, ToSQLStatement}, sql_token::{Symbol, ToSQLToken, Tokenize}, SQLToken};
+use sqlite_fsr::command::sql::parser::{sql_statement::{SQLStatement, ToSQLStatement, AggregatorFunction}, sql_token::{ Symbol, ToSQLToken, Tokenize}, SQLToken};
 
 #[test]
 fn test_ToSQLToken_converts_string_to_token_correctly() {
@@ -56,6 +56,43 @@ fn test_ToSQLToken_converts_string_to_token_correctly_5() {
     assert!(matches!(result[10], SQLToken::Symbol(Symbol::Semicolon)));
 }
 
+#[test]
+fn test_ToSQLToken_converts_string_to_token_correctly_6() {
+    let string = "(name,";
+    let result = string.tokenize();
+
+    assert_eq!(result.len(), 3);
+    match &result[1] {
+        SQLToken::Identifier(identifier) => assert_eq!(identifier, "name"),
+        _ => panic!("Expected CreateTable statement"),
+
+    }
+}
+
+#[test]
+fn test_ToSQLToken_converts_string_to_token_correctly_7() {
+    let string = "name TEXT);";
+    let result = string.tokenize();
+
+    assert_eq!(result.len(), 4);
+    match &result[0] {
+        SQLToken::Identifier(identifier) => assert_eq!(identifier, "name"),
+        _ => panic!("Expected CreateTable statement"),
+    }
+}
+
+#[test]
+fn test_ToSQLToken_converts_string_to_token_correctly_8() {
+    let string = "sqlite_sequence(name,seq";
+    let result = string.tokenize();
+
+    assert_eq!(result.len(), 5);
+    match &result[0] {
+        SQLToken::Identifier(identifier) => assert_eq!(identifier, "sqlite_sequence"),
+        _ => panic!("Expected CreateTable statement"),
+
+    }
+}
 
 #[test]
 fn test_ToSQLStatement_converts_string_to_statement_correct_1() {
@@ -72,5 +109,113 @@ fn test_ToSQLStatement_converts_string_to_statement_correctly_2() {
     let result = string.to_sql_statment().unwrap();
     
     assert!(matches!(result, SQLStatement::CreateTable(_)))
+}
 
+#[test]
+fn test_ToSQLStatement_extracts_tablename_from_CREATE_statement_correctly() {
+    let string = "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT);";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::CreateTable(statement) => assert_eq!(statement.table_name, "users"),
+        _ => panic!("Expected CreateTable statement"),
+    }
+}
+
+#[test]
+fn test_ToSQLStatement_extracts_tablename_from_CREATE_statement_correctly_2() {
+    let string = "CREATE TABLE apples\n( \nid integer primary key autoincrement, \nname text, \ncolor text\n)";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::CreateTable(statement) => assert_eq!(statement.table_name, "apples"),
+        _ => panic!("Expected CreateTable statement"),
+    }
+}
+
+
+
+#[test]
+fn test_ToSQLStatement_extracts_columns_from_CREATE_statement_correctly() {
+    let string = "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT);";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::CreateTable(statement) => assert_eq!(statement.columns, vec!["id", "name"]),
+        _ => panic!("Expected CreateTable statement"),
+    }
+}
+
+#[test]
+fn test_ToSQLStatement_extracts_columns_from_CREATE_statement_correctly_2() {
+    let string = "CREATE TABLE users ( id INTEGER PRIMARY KEY, name TEXT );";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::CreateTable(statement) => assert_eq!(statement.columns, vec!["id", "name"]),
+        _ => panic!("Expected CreateTable statement"),
+    }
+}
+
+#[test]
+fn test_ToSQLStatement_extracts_tablename_from_SELECT_statement_correctly() {
+    let string = "SELECT (name, age, weight) FROM people;";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::Select(statement) => assert_eq!(statement.table_name, "people"),
+        _ => panic!("Expected SELECT statement"),
+    }
+}
+
+#[test]
+fn test_ToSQLStatement_extracts_tablename_from_SELECT_statement_correctly_2() {
+    let string = "SELECT ( region, type ) FROM datacenters;";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::Select(statement) => assert_eq!(statement.table_name, "datacenters"),
+        _ => panic!("Expected SELECT statement"),
+    }
+}
+
+
+
+#[test]
+fn test_ToSQLStatement_extracts_columns_from_SELECT_statement_correctly() {
+    let string = "SELECT (name, age, weight) FROM people;";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::Select(statement) => match statement.columns {
+                                                Some(columns) => assert_eq!(columns, vec!["name", "age", "weight"]),
+                                                None => panic!("Columns not properly extracted from SELECT statment")
+                                            },
+        _ => panic!("Expected CreateTable statement"),
+    }
+}
+
+#[test]
+fn test_ToSQLStatement_extracts_columns_from_SELECT_statement_correctly_2() {
+    let string = "SELECT * FROM people;";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::Select(statement) => assert_eq!(statement.columns, None),
+        _ => panic!("Expected CreateTable statement"),
+    }
+}
+
+#[test]
+fn test_ToSQLStatement_extracts_aggregator_function_correctly() {
+    let string = "SELECT COUNT(*) FROM apples";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::Select(statement) => assert_eq!(statement.aggregator_function, Some(AggregatorFunction::COUNT)),
+        _ => panic!()
+    }
+}
+
+
+
+#[test]
+fn test_TOSQLStatement_detects_INTEGER_PRIMARY_KEY_column() {
+    let string = "CREATE TABLE apples (id integer primary key autoincrement, name text, color text)";
+    let result = string.to_sql_statment().unwrap();
+    match result {
+        SQLStatement::CreateTable(statement) => assert!(statement.integer_primary_key_column.is_some()),
+        _ => panic!("Expected CreateTable statement")
+    }
 }

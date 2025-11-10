@@ -41,7 +41,7 @@ pub fn run(args: &[String]) -> Result<String, RunError> {
                             Ok(format!("{}", tables.join(" ")))
                         }
                         "SELECT" => {
-                            let result = sql::execute(command, &mut file);
+                            let result = sql::execute(command.join(" ").as_str(), &mut file);
                             match result {
                                 Ok(rows) => Ok(format!("{}", rows.len())),
                                 Err(e) => Err(e)?
