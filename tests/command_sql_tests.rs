@@ -14,29 +14,41 @@ fn test_COUNT_sql_command_executes_without_error() {
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows() {
     let mut file = DBFile::open(PathBuf::from("./sample.db")).unwrap();
-    let result = sql::execute("SELECT COUNT(*) FROM apples", &mut file).unwrap();
-    assert_eq!(result.len(), 4);
+    let result: Vec<String> = sql::execute("SELECT COUNT(*) FROM apples", &mut file).unwrap()
+                                                                                    .iter()
+                                                                                    .map(|record| record.to_string())
+                                                                                    .collect();
+    assert_eq!(result, vec!["4"]);
 }
 
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows_2() {
     let mut file = DBFile::open(PathBuf::from("./sample.db")).unwrap();
-    let result = sql::execute("SELECT COUNT(*) FROM oranges", &mut file).unwrap();
-    assert_eq!(result.len(), 6);
+    let result: Vec<String> = sql::execute("SELECT COUNT(*) FROM oranges", &mut file).unwrap()
+                                                                                    .iter()
+                                                                                    .map(|record| record.to_string())
+                                                                                    .collect();
+    assert_eq!(result, vec!["6"]);
 }
 
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows_3() {
     let mut file = DBFile::open(PathBuf::from("./superheroes.db")).unwrap();
-    let result = sql::execute("SELECT COUNT(*) FROM superheroes", &mut file).unwrap();
-    assert_eq!(result.len(), 6895);
+    let result: Vec<String> = sql::execute("SELECT COUNT(*) FROM superheroes", &mut file).unwrap()
+                                                                                        .iter()
+                                                                                        .map(|record| record.to_string())
+                                                                                        .collect();
+    assert_eq!(result, vec!["6895"]);
 }
 
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows_4() {
     let mut file = DBFile::open(PathBuf::from("./companies.db")).unwrap();
-    let result = sql::execute("SELECT COUNT(*) FROM companies", &mut file).unwrap();
-    assert_eq!(result.len(), 55991);
+    let result: Vec<String> = sql::execute("SELECT COUNT(*) FROM companies", &mut file).unwrap()
+                                                                        .iter()
+                                                                        .map(|record| record.to_string())
+                                                                        .collect();
+    assert_eq!(result, vec!["55991"]);
 }
 
 #[test]
