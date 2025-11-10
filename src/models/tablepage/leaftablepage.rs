@@ -1,4 +1,4 @@
-use crate::command::sql::parser::sql_statement::{CreateTableStatement, SelectStatement};
+use crate::command::sql::parser::sql_statement::{AggregatorFunction, CreateTableStatement, SelectStatement};
 use crate::utils::varint::parse_varint;
 use crate::models::record::Record;
 use crate::models::tablepage::Table;
@@ -68,8 +68,8 @@ impl Table for LeafTablePage {
             let mut column_descriptions_with_values: Vec<_>  = column_descriptions.iter().zip(column_values.iter()).collect();
             if let Some(statement_columns) = &statement.columns {
                 let selected_columns: Vec<_> = column_descriptions_with_values.iter()
-                                                                            .filter(|(column_description, _)| statement_columns.contains(column_description.0))
-                                                                            .collect();
+                                                                              .filter(|(column_description, _)| statement_columns.contains(column_description.0))
+                                                                              .collect();
                
                 let selected_columns_value_sizes: Vec<i64> = selected_columns.iter().map(|column| column.0.1.clone()).collect();
                 let selected_columns_values: Vec<Vec<u8>> = selected_columns.iter().map(|column| column.1.clone()).collect();
@@ -80,6 +80,9 @@ impl Table for LeafTablePage {
                 let table_row = Record { row_id, column_values, column_headers: column_value_sizes };
                 table_rows.push(table_row);        
             }
+
+
+
         }
         return table_rows;
     }

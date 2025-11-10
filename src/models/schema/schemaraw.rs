@@ -117,8 +117,6 @@ impl SchemaRAW {
                             }
                        } else { panic!() };
 
-            // let sql = CreateTableStatement::from_tokens(sql_string.tokenize());
-
             let schemarow_header = SchemaRow { object_type, name, table_name, rootpage, sql };
             header_entries.push(schemarow_header);        
         }
