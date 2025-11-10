@@ -1,4 +1,4 @@
-use crate::command::sql::parser::sql_statement::CreateTableStatement;
+use crate::command::sql::parser::sql_statement::{CreateIndexStatement, CreateTableStatement};
 use crate::command::sql::parser::sql_token::Tokenize;
 use crate::models::schema::SchemaRow;
 use crate::utils::varint::parse_varint;
@@ -112,7 +112,7 @@ impl SchemaRAW {
             let sql = if let SQLToken::Identifier(token) = &sql_string_tokens[1] {
                             match token.as_str() {
                                 "TABLE" => CreateTableStatement::from_tokens(sql_string_tokens),
-                                "INDEX" => todo!("Add struct for CREATE INDEX statement"),
+                                "INDEX" => continue,
                                 _ => panic!()
                             }
                        } else { panic!() };

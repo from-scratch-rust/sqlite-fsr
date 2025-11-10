@@ -7,7 +7,9 @@ use crate::command::sql;
 
 pub fn execute(sql_statment_string: &str, file: &mut DBFile) -> Result<Vec<Record>, SQLCommandError> {
 
-    let sql_statement = sql_statment_string.to_sql_statment().unwrap();
+    let sql_statement = sql_statment_string
+                        .to_sql_statment()
+                        .map_err(|err| SQLCommandError::UnsupportedCommand(err.to_string()))?;
 
     let result = match sql_statement {
                         SQLStatement::Select(statement) => {

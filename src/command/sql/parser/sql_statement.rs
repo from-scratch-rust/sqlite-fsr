@@ -88,6 +88,7 @@ impl SelectStatement {
         if let Some(SQLToken::Keyword(first_word)) = tokens_cursor.nth(0) { assert!(first_word == "SELECT") }
         else { panic!() }
                 
+        tokens_cursor.next_if(|t| matches!(t, SQLToken::Symbol(Symbol::LeftParenthesis)));
 
         let aggregator_function = if let Some(SQLToken::Identifier(token)) = tokens_cursor.peek() {
                                         match token.as_str() {
@@ -167,5 +168,21 @@ impl ToSQLStatement for &str {
             SQLToken::Keyword(s) if s == "SELECT" => Ok(SQLStatement::Select(SelectStatement::from_tokens(tokens))),            
             _ => Err(SQLSyntaxError::UnexpectedToken(String::new()))
         }
+    }
+}
+
+
+
+pub struct CreateIndexStatement {
+    tablename: String,
+    columns: Vec<String>
+}
+
+impl CreateIndexStatement {
+    pub fn from_tokens(tokens: Vec<SQLToken>) -> Self {
+        let tablename = String::new();
+        let columns = Vec::new();
+
+        CreateIndexStatement { tablename, columns }
     }
 }
