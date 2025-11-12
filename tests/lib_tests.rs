@@ -36,3 +36,10 @@ fn test_run_fails_when_invalid_filepath() {
     let result = run(&args).unwrap_err();
     assert!(matches!(result, RunError::Args(CommandArgsError::Io(_))));
 }
+
+
+#[test]
+fn test_fail() {
+
+    assert!(matches!(1,3));
+}
