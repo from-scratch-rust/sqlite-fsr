@@ -38,8 +38,3 @@ fn test_run_fails_when_invalid_filepath() {
 }
 
 
-#[test]
-fn test_fail() {
-
-    assert!(matches!(1,3));
-}
