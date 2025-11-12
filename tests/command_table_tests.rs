@@ -5,7 +5,7 @@ use sqlite_fsr::command::tables;
 
 #[test]
 fn test_tables_command_reads_table_names_correctly() {
-    let mut file = File::open("./sample.db").unwrap();
+    let mut file = File::open("./tests/assets/sample.db").unwrap();
     let raw_schema = extract_raw_schema_data(&mut file);
     let result = tables::get_table_names(&raw_schema);
     assert_eq!(result, ["apples", "oranges"]);
