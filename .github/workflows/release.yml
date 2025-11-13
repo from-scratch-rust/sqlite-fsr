@@ -48,6 +48,9 @@ jobs:
       - name: List downloaded artifacts
         run: ls
 
+      - name: List downloaded artifacts
+        run: ls
+        
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
