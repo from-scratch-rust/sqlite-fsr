@@ -36,24 +36,21 @@ jobs:
           path: target/${{ matrix.target }}/realease/
 
   release:
-    name: Create Github Release
+    name: Create GitHub Release
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ./artifacts
+          path: artifacts
 
       - name: List downloaded artifacts
-        run: ls
+        run: ls -R artifacts
 
-      - name: List downloaded artifacts
-        run: ls
-        
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ./artifacts/**/*
+          files: artifacts/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
