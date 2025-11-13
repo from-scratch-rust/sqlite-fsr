@@ -5,6 +5,9 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
@@ -31,14 +34,18 @@ jobs:
       - name: Build binary
         run: cargo build --release --target ${{ matrix.target }}
 
-      - name: Prepare artifact
+      - name: Prepare artifact (Linux/macOS)
+        if: runner.os != 'Windows'
         run: |
           mkdir -p artifacts
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            cp target/${{ matrix.target }}/release/sqlite-fsr.exe artifacts/${{ matrix.artifact_name }}
-          else
-            cp target/${{ matrix.target }}/release/sqlite-fsr artifacts/${{ matrix.artifact_name }}
-          fi
+          cp target/${{ matrix.target }}/release/sqlite-fsr artifacts/${{ matrix.artifact_name }}
+
+      - name: Prepare artifact (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          mkdir artifacts
+          copy target\${{ matrix.target }}\release\sqlite-fsr.exe artifacts\${{ matrix.artifact_name }}
+
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
