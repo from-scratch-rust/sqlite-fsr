@@ -11,6 +11,7 @@ fn test_tables_command_reads_table_names_correctly() {
     assert_eq!(result, ["apples", "oranges"]);
 }
 
+
 #[test]
 fn test_from_bytes_extracts_schemaraw_data_correctly() {
     let DB_PAGE_SIZE = 4096 as u16;
