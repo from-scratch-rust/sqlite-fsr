@@ -107,8 +107,8 @@ impl SchemaRAW {
             record_body_offset = record_body_offset+record_header_value_sizes[4] as usize;
             let sql_bytes = record_body[record_body_offset..].to_vec();
             let sql_string = String::from_utf8(sql_bytes).unwrap();
-            print!("sql_string: {}", sql_string);
             let sql_string_tokens = sql_string.tokenize();
+            if sql_string_tokens.len() < 2 { continue; }
             let sql = if let SQLToken::Identifier(token) = &sql_string_tokens[1] {
                             match token.as_str() {
                                 "TABLE" => CreateTableStatement::from_tokens(sql_string_tokens),
