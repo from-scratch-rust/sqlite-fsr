@@ -6,3 +6,4 @@ pub mod tablepage;
 pub mod dbfile;
 pub use dbfile::DBFile;
 pub mod table;
+pub use record::Records;
