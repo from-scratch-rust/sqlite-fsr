@@ -3,6 +3,9 @@ use std::io::{Read, Seek, SeekFrom};
 use std::path::PathBuf;
 use crate::models::Records;
 use crate::models::schema::SchemaRAW;
+use crate::command::sql::parser::sql_statement::SQLStatement;
+use crate::models::schema::schemarow::SchemaRow;
+use crate::command::sql;
 use crate::models::table::DBTable;
 use std::ops::Deref;
 use std::ops::DerefMut;
@@ -44,6 +47,38 @@ impl DBFile {
     //                                                 .find(|entry| entry.table_name == table_name)
     //                                                 .ok_or_else(|| SQLCommandError::UnknownTable(table_name))?;
     // }
+
+    pub fn execute(&mut self, sql_statement: SQLStatement) -> Result<Records, SQLCommandError> {
+        match sql_statement {
+            SQLStatement::Select(statement) => {
+                let target_table_schema_entry: SchemaRow = self.schema
+                                                            .to_schema_rows()
+                                                            .into_iter()
+                                                            .find(|entry| entry.table_name == statement.table_name)
+                                                            .ok_or_else(|| SQLCommandError::UnknownTable(statement.table_name.to_string()))?;
+
+                let results = sql::select(statement, &target_table_schema_entry, self);
+                Ok(Records::from(results))
+            },
+            _ => Err(SQLCommandError::UnsupportedCommand(String::new()))
+        }
+    }
+
+    /// Delegate: call the standalone `command::dbinfo::get_dbinfo` for this file's schema.
+    pub fn get_dbinfo(&self) -> (u16, usize) {
+        return (self.schema.page_size, self.schema.cells.len());
+    }
+
+    /// Delegate: call the standalone `command::tables::get_table_names` for this file's schema.
+    pub fn get_table_names(&self) -> Vec<String> {
+        let mut table_names: Vec<String>  = Vec::from([]); 
+        for schemarow_header in self.schema.to_schema_rows() {
+            if !schemarow_header.name.starts_with("sqlite_") { 
+                table_names.push(schemarow_header.table_name); 
+            }
+        }
+        return table_names;
+    }
 }
 
 impl Deref for DBFile {

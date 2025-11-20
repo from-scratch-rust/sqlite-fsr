@@ -1,5 +1,4 @@
 use sqlite_fsr::models::schema::*;
-use sqlite_fsr::command::dbinfo;
 
 #[test]
 fn test_dbinfo_command_reads_pagesize_correctly() {
