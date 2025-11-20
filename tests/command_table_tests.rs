@@ -1,13 +1,12 @@
-use std::fs::File;
+use std::path::PathBuf;
 use sqlite_fsr::utils::varint::*;
 use sqlite_fsr::models::schema::*;
-use sqlite_fsr::command::tables;
+use sqlite_fsr::models::DBFile;
 
 #[test]
 fn test_tables_command_reads_table_names_correctly() {
-    let mut file = File::open("./tests/assets/sample.db").unwrap();
-    let raw_schema = extract_raw_schema_data(&mut file);
-    let result = tables::get_table_names(&raw_schema);
+    let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
+    let result = file.get_table_names();
     assert_eq!(result, ["apples", "oranges"]);
 }
 
