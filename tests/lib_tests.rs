@@ -35,7 +35,7 @@ fn test_run_succeeds_when_valid_command() {
 fn test_run_returns_correct_output() {
     let args = vec![String::new(), String::from("./tests/assets/sample.db"), String::from("SELECT * FROM apples;")];
     let result = run(&args).unwrap();
-    assert_eq!(result, String::from("1 Granny Smith Light Green 2 Fuji Red 3 Honeycrisp Blush Red 4 Golden Delicious Yellow"));
+    assert_eq!(result, String::from("1 Granny Smith Light Green\n2 Fuji Red\n3 Honeycrisp Blush Red\n4 Golden Delicious Yellow\n"));
 }
 
 
