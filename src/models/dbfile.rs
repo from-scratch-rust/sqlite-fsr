@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 use std::path::PathBuf;
+use crate::models::Records;
 use crate::models::schema::SchemaRAW;
 use crate::models::table::DBTable;
 use std::ops::Deref;

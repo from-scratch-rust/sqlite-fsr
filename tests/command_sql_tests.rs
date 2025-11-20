@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 use sqlite_fsr::command::{sql};
+use sqlite_fsr::command::sql::parser::sql_statement::ToSQLStatement;
 use sqlite_fsr::models::{DBFile};
 use sqlite_fsr::run;
 
@@ -14,7 +15,7 @@ fn test_COUNT_sql_command_executes_without_error() {
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
-    let result: Vec<String> = sql::execute("SELECT COUNT(*) FROM apples", &mut file).unwrap()
+    let result: Vec<String> = sql::execute("SELECT COUNT(*) FROM apples".to_sql_statment().unwrap(), &mut file).unwrap()
                                                                                     .iter()
                                                                                     .map(|record| record.to_string())
                                                                                     .collect();
@@ -24,7 +25,7 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows() {
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows_2() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
-    let result: Vec<String> = sql::execute("SELECT COUNT(*) FROM oranges", &mut file).unwrap()
+    let result: Vec<String> = sql::execute("SELECT COUNT(*) FROM oranges".to_sql_statment().unwrap(), &mut file).unwrap()
                                                                                     .iter()
                                                                                     .map(|record| record.to_string())
                                                                                     .collect();
@@ -34,7 +35,7 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows_2() {
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows_3() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/superheroes.db")).unwrap();
-    let result: Vec<String> = sql::execute("SELECT COUNT(*) FROM superheroes", &mut file).unwrap()
+    let result: Vec<String> = sql::execute("SELECT COUNT(*) FROM superheroes".to_sql_statment().unwrap(), &mut file).unwrap()
                                                                                         .iter()
                                                                                         .map(|record| record.to_string())
                                                                                         .collect();
@@ -44,7 +45,7 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows_3() {
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows_4() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/companies.db")).unwrap();
-    let result: Vec<String> = sql::execute("SELECT COUNT(*) FROM companies", &mut file).unwrap()
+    let result: Vec<String> = sql::execute("SELECT COUNT(*) FROM companies".to_sql_statment().unwrap(), &mut file).unwrap()
                                                                         .iter()
                                                                         .map(|record| record.to_string())
                                                                         .collect();
@@ -54,7 +55,7 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows_4() {
 #[test]
 fn test_SELECT_sql_command_returns_correct_values() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
-    let result: Vec<String> = sql::execute("SELECT name FROM apples", &mut file)
+    let result: Vec<String> = sql::execute("SELECT name FROM apples".to_sql_statment().unwrap(), &mut file)
                                 .unwrap()
                                 .iter()
                                 .map(|record| record.to_string())
@@ -66,7 +67,7 @@ fn test_SELECT_sql_command_returns_correct_values() {
 #[test]
 fn test_SELECT_sql_command_returns_correct_values_2() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
-    let result: Vec<String> = sql::execute("SELECT name, color FROM apples", &mut file)
+    let result: Vec<String> = sql::execute("SELECT name, color FROM apples".to_sql_statment().unwrap(), &mut file)
                                 .unwrap()
                                 .iter()
                                 .map(|record| record.to_string())
@@ -80,7 +81,7 @@ fn test_SELECT_sql_command_returns_correct_values_2() {
 #[test]
 fn test_SELECT_sql_command_returns_correct_values_3() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
-    let result: Vec<String> = sql::execute("SELECT * FROM apples", &mut file)
+    let result: Vec<String> = sql::execute("SELECT * FROM apples".to_sql_statment().unwrap(), &mut file)
                                 .unwrap()
                                 .iter()
                                 .map(|record| record.to_string())
@@ -95,7 +96,9 @@ fn test_SELECT_sql_command_returns_correct_values_3() {
 #[test]
 fn test_COUNT_sql_command_returns_error_when_table_not_found() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
-    let result = sql::execute("SELECT COUNT(*) FROM seafood", &mut file);
+    let result = "SELECT COUNT(*) FROM seafood".to_sql_statment()
+                        .map_err(|e| sqlite_fsr::models::error::SQLCommandError::UnsupportedCommand(e.to_string()))
+                        .and_then(|stmt| sql::execute(stmt, &mut file));
     assert!(result.is_err());
 }
 
@@ -104,6 +107,8 @@ fn test_COUNT_sql_command_returns_error_when_table_not_found() {
 #[test]
 fn test_sql_command_returns_error_when_command_not_supported() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
-    let result = sql::execute("WHOOPTY COUNT(*) FROM seafood", &mut file);
+    let result = "WHOOPTY COUNT(*) FROM seafood".to_sql_statment()
+                        .map_err(|e| sqlite_fsr::models::error::SQLCommandError::UnsupportedCommand(e.to_string()))
+                        .and_then(|stmt| sql::execute(stmt, &mut file));
     assert!(result.is_err());
 }

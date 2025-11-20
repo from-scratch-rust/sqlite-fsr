@@ -6,6 +6,7 @@ use crate::models::error::*;
 use crate::command::tables;
 use crate::command::dbinfo;
 use crate::command::sql;
+use crate::command::sql::parser::sql_statement::ToSQLStatement;
 use crate::models::DBFile;
 
 pub fn run(args: &[String]) -> Result<String, RunError> {
@@ -41,7 +42,10 @@ pub fn run(args: &[String]) -> Result<String, RunError> {
                             Ok(format!("{}", tables.join(" ")))
                         }
                         "SELECT" => {
-                            let result = sql::execute(command.join(" ").as_str(), &mut file);
+                            let sql_statement = command.to_sql_statment()
+                                                        .map_err(|err| SQLCommandError::UnsupportedCommand(err.to_string()))?;
+
+                            let result = sql::execute(sql_statement, &mut file);
                             match result {
                                 Ok(rows) => Ok(format!("{}", rows)),
                                 Err(e) => Err(e)?
