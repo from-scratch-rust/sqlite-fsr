@@ -38,10 +38,7 @@ impl From<Vec<Record>> for Records {
 impl fmt::Display for Records {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for (i, rec) in self.0.iter().enumerate() {
-            write!(f, "{}", rec)?;
-            if i != self.0.len() - 1 {
-                write!(f, " ")?;
-            }
+            writeln!(f, "{}", rec)?;
         }
         Ok(())
     }
@@ -49,7 +46,6 @@ impl fmt::Display for Records {
 
 impl std::ops::Deref for Records {
     type Target = [Record];
-
     fn deref(&self) -> &Self::Target {
         &self.0
     }
