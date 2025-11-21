@@ -10,6 +10,10 @@ pub struct DBTable <'a>{
 
 
 impl DBTable <'_> {
+    pub fn new(description: SchemaRow, dbfile: &mut DBFile) -> DBTable {
+        DBTable { description, dbfile }
+    }
+
     pub fn to_table_rows(&mut self, statement: SelectStatement) -> Vec<Record> {
         
         let table_rootpage_offset = self.dbfile.schema.page_size as u64 * (self.description.rootpage-1) as u64;

@@ -15,51 +15,55 @@ fn test_COUNT_sql_command_executes_without_error() {
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
-    let result: Vec<String> = file.execute("SELECT COUNT(*) FROM apples".to_sql_statment().unwrap()).unwrap()
-                                                                                    .iter()
-                                                                                    .map(|record| record.to_string())
-                                                                                    .collect();
+    let sql_statement = "SELECT COUNT(*) FROM apples".to_sql_statment().unwrap();
+    let result: Vec<String> = file.execute(sql_statement).unwrap()
+                                                         .iter()
+                                                         .map(|record| record.to_string())
+                                                         .collect();
     assert_eq!(result, vec!["4"]);
 }
 
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows_2() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
-    let result: Vec<String> = file.execute("SELECT COUNT(*) FROM oranges".to_sql_statment().unwrap()).unwrap()
-                                                                                    .iter()
-                                                                                    .map(|record| record.to_string())
-                                                                                    .collect();
+    let sql_statement = "SELECT COUNT(*) FROM oranges".to_sql_statment().unwrap();
+    let result: Vec<String> = file.execute(sql_statement).unwrap()
+                                                         .iter()
+                                                         .map(|record| record.to_string())
+                                                         .collect();
     assert_eq!(result, vec!["6"]);
 }
 
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows_3() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/superheroes.db")).unwrap();
-    let result: Vec<String> = file.execute("SELECT COUNT(*) FROM superheroes".to_sql_statment().unwrap()).unwrap()
-                                                                                        .iter()
-                                                                                        .map(|record| record.to_string())
-                                                                                        .collect();
+    let sql_statement = "SELECT COUNT(*) FROM superheroes".to_sql_statment().unwrap();
+    let result: Vec<String> = file.execute(sql_statement).unwrap()
+                                                         .iter()
+                                                         .map(|record| record.to_string())
+                                                         .collect();
     assert_eq!(result, vec!["6895"]);
 }
 
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows_4() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/companies.db")).unwrap();
-    let result: Vec<String> = file.execute("SELECT COUNT(*) FROM companies".to_sql_statment().unwrap()).unwrap()
-                                                                        .iter()
-                                                                        .map(|record| record.to_string())
-                                                                        .collect();
+    let sql_statement = "SELECT COUNT(*) FROM companies".to_sql_statment().unwrap();    
+    let result: Vec<String> = file.execute(sql_statement).unwrap()
+                                                         .iter()
+                                                         .map(|record| record.to_string())
+                                                         .collect();
     assert_eq!(result, vec!["55991"]);
 }
 
 #[test]
 fn test_SELECT_sql_command_returns_correct_values() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
-    let result: Vec<String> = file.execute("SELECT name FROM apples".to_sql_statment().unwrap())
-                                .unwrap()
-                                .iter()
-                                .map(|record| record.to_string())
-                                .collect();
+    let sql_statement = "SELECT name FROM apples".to_sql_statment().unwrap();    
+    let result: Vec<String> = file.execute(sql_statement).unwrap()
+                                                         .iter()
+                                                         .map(|record| record.to_string())
+                                                         .collect();
                 
     assert_eq!(result, vec!["Granny Smith", "Fuji", "Honeycrisp", "Golden Delicious"]);
 }
@@ -67,11 +71,12 @@ fn test_SELECT_sql_command_returns_correct_values() {
 #[test]
 fn test_SELECT_sql_command_returns_correct_values_2() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
-    let result: Vec<String> = file.execute("SELECT name, color FROM apples".to_sql_statment().unwrap())
-                                .unwrap()
-                                .iter()
-                                .map(|record| record.to_string())
-                                .collect();
+    let sql_statement = "SELECT name, color FROM apples".to_sql_statment().unwrap();    
+
+    let result: Vec<String> = file.execute(sql_statement).unwrap()
+                                                         .iter()
+                                                         .map(|record| record.to_string())
+                                                         .collect();
                 
     assert_eq!(result, vec!["Granny Smith Light Green", "Fuji Red", "Honeycrisp Blush Red", "Golden Delicious Yellow"]);
 }
@@ -81,16 +86,14 @@ fn test_SELECT_sql_command_returns_correct_values_2() {
 #[test]
 fn test_SELECT_sql_command_returns_correct_values_3() {
     let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
-    let result: Vec<String> = file.execute("SELECT * FROM apples".to_sql_statment().unwrap())
-                                .unwrap()
-                                .iter()
-                                .map(|record| record.to_string())
-                                .collect();
+    let sql_statement = "SELECT * FROM apples".to_sql_statment().unwrap();
+    let result: Vec<String> = file.execute(sql_statement).unwrap()
+                                                         .iter()
+                                                         .map(|record| record.to_string())
+                                                         .collect();
                 
     assert_eq!(result, vec!["1 Granny Smith Light Green", "2 Fuji Red", "3 Honeycrisp Blush Red", "4 Golden Delicious Yellow"]);
 }
-
-
 
 
 #[test]

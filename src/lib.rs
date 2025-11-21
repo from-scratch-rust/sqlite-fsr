@@ -5,8 +5,7 @@ use std::path::PathBuf;
 use crate::models::error::*;
 use crate::command::sql;
 use crate::command::sql::parser::sql_statement::ToSQLStatement;
-// use crate::command::tables;
-// use crate::command::dbinfo;
+
 use crate::models::DBFile;
 
 pub fn run(args: &[String]) -> Result<String, RunError> {
@@ -28,7 +27,6 @@ pub fn run(args: &[String]) -> Result<String, RunError> {
                         Err(e) => return Err(CommandArgsError::Io(e))?
                     };
 
-    let raw_schema = &file.schema;
     let output = match command[0] {
                         ".dbinfo" => {
                             let (page_size, table_count) = file.get_dbinfo();
