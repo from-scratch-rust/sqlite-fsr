@@ -1,7 +1,7 @@
 
 use crate::command::sql::parser::sql_statement::{SelectStatement, AggregatorFunction};
-use crate::models::record::Record;
-use crate::models::table::DBTable;
+use crate::models::dbfile::dbtable::record::Record;
+use crate::models::dbfile::table::DBTable;
 
 pub fn select(table: &mut DBTable, mut statement: SelectStatement) -> Vec<Record> {
     // take aggregator out of the statement so we can pass the (now non-aggregating) statement

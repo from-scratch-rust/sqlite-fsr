@@ -1,6 +1,6 @@
-use crate::{command::sql::parser::sql_statement::{SelectStatement}, models::{record::Record, schema::SchemaRow, DBFile}};
-use crate::models::tablepage::*;
-use crate::models::tablepage::Table;
+use crate::{command::sql::parser::sql_statement::{SelectStatement}, models::dbfile::dbtable::record::Record, models::dbfile::schema::SchemaRow, DBFile};
+use crate::models::dbfile::dbtable::tablepage::*;
+use crate::models::dbfile::dbtable::tablepage::Table;
 use std::io::{Seek, SeekFrom, Read};
 
 pub struct DBTable <'a>{

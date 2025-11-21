@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use sqlite_fsr::models::{DBFile, schema::*};
+use sqlite_fsr::models::dbfile::{DBFile, schema::*};
 
 #[test]
 fn test_dbinfo_command_reads_pagesize_correctly() {

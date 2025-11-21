@@ -1,6 +1,6 @@
 use crate::command::sql::parser::sql_statement::{CreateIndexStatement, CreateTableStatement};
 use crate::command::sql::parser::sql_token::Tokenize;
-use crate::models::schema::SchemaRow;
+use crate::models::dbfile::schema::SchemaRow;
 use crate::utils::varint::parse_varint;
 use crate::sql::parser::SQLToken;
 

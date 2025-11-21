@@ -1,7 +1,7 @@
 use crate::command::sql::parser::sql_statement::{AggregatorFunction, CreateTableStatement, SelectStatement};
 use crate::utils::varint::parse_varint;
-use crate::models::record::Record;
-use crate::models::tablepage::Table;
+use crate::models::dbfile::dbtable::record::Record;
+use crate::models::dbfile::dbtable::tablepage::Table;
 
 #[derive(Debug)]
 pub struct LeafTablePage {

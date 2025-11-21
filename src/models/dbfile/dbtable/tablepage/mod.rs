@@ -1,4 +1,4 @@
-use crate::{command::sql::parser::sql_statement::{CreateTableStatement, SelectStatement}, models::record::Record};
+use crate::{command::sql::parser::sql_statement::{CreateTableStatement, SelectStatement}, models::dbfile::dbtable::record::Record};
 
 pub mod interiortablepage;
 pub use interiortablepage::InteriorTablePage;

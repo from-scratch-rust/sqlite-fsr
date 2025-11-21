@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 use sqlite_fsr::utils::varint::*;
-use sqlite_fsr::models::schema::*;
+use sqlite_fsr::models::dbfile::schema::*;
 use sqlite_fsr::models::DBFile;
 
 #[test]

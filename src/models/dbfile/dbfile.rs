@@ -1,12 +1,12 @@
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 use std::path::PathBuf;
-use crate::models::{Records};
-use crate::models::schema::SchemaRAW;
+use crate::models::dbfile::dbtable::Records;
+use crate::models::dbfile::schema::SchemaRAW;
 use crate::command::sql::parser::sql_statement::SQLStatement;
-use crate::models::schema::schemarow::SchemaRow;
+use crate::models::dbfile::schema::schemarow::SchemaRow;
 use crate::command::sql;
-use crate::models::table::DBTable;
+use crate::models::dbfile::dbtable::DBTable;
 use std::ops::Deref;
 use std::ops::DerefMut;
 use std::io;

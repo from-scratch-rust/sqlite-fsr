@@ -6,7 +6,7 @@ use crate::models::error::*;
 use crate::command::sql;
 use crate::command::sql::parser::sql_statement::ToSQLStatement;
 
-use crate::models::DBFile;
+pub use models::DBFile;
 
 pub fn run(args: &[String]) -> Result<String, RunError> {
     if args.len() <= 1 {
