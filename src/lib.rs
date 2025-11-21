@@ -3,10 +3,10 @@ pub mod models;
 pub mod command;
 use std::path::PathBuf;
 use crate::models::error::*;
-use crate::command::tables;
-use crate::command::dbinfo;
 use crate::command::sql;
-use crate::models::DBFile;
+use crate::command::sql::parser::sql_statement::ToSQLStatement;
+
+pub use models::DBFile;
 
 pub fn run(args: &[String]) -> Result<String, RunError> {
     if args.len() <= 1 {
@@ -27,21 +27,23 @@ pub fn run(args: &[String]) -> Result<String, RunError> {
                         Err(e) => return Err(CommandArgsError::Io(e))?
                     };
 
-    let raw_schema = &file.schema;
     let output = match command[0] {
                         ".dbinfo" => {
-                            let (page_size, table_count) = dbinfo::get_dbinfo(raw_schema);
+                            let (page_size, table_count) = file.get_dbinfo();
                             Ok(format!(
                                 "database page size: {}\nnumber of tables: {}",
                                 page_size, table_count
                             ))
                         }
                         ".tables" => {
-                            let tables = tables::get_table_names(&raw_schema);
+                            let tables = file.get_table_names();
                             Ok(format!("{}", tables.join(" ")))
                         }
                         "SELECT" => {
-                            let result = sql::execute(command.join(" ").as_str(), &mut file);
+                            let sql_statement = command.to_sql_statment()
+                                                        .map_err(|err| SQLCommandError::UnsupportedCommand(err.to_string()))?;
+
+                            let result = file.execute(sql_statement);
                             match result {
                                 Ok(rows) => Ok(format!("{}", rows)),
                                 Err(e) => Err(e)?

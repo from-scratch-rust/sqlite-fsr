@@ -1,6 +1,6 @@
-use crate::{command::sql::parser::sql_statement::{SelectStatement}, models::{record::Record, schema::SchemaRow, DBFile}};
-use crate::models::tablepage::*;
-use crate::models::tablepage::Table;
+use crate::{command::sql::parser::sql_statement::{SelectStatement}, models::dbfile::dbtable::record::Record, models::dbfile::schema::SchemaRow, DBFile};
+use crate::models::dbfile::dbtable::tablepage::*;
+use crate::models::dbfile::dbtable::tablepage::Table;
 use std::io::{Seek, SeekFrom, Read};
 
 pub struct DBTable <'a>{
@@ -10,6 +10,10 @@ pub struct DBTable <'a>{
 
 
 impl DBTable <'_> {
+    pub fn new(description: SchemaRow, dbfile: &mut DBFile) -> DBTable {
+        DBTable { description, dbfile }
+    }
+
     pub fn to_table_rows(&mut self, statement: SelectStatement) -> Vec<Record> {
         
         let table_rootpage_offset = self.dbfile.schema.page_size as u64 * (self.description.rootpage-1) as u64;

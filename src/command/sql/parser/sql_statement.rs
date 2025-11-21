@@ -171,6 +171,13 @@ impl ToSQLStatement for &str {
     }
 }
 
+impl ToSQLStatement for Vec<&str> {
+    fn to_sql_statment(&self) -> Result<SQLStatement, SQLSyntaxError> {
+        let joined = self.join(" ");
+        joined.as_str().to_sql_statment()
+    }
+}
+
 
 
 pub struct CreateIndexStatement {

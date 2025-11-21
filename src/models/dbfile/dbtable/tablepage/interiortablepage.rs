@@ -1,9 +1,9 @@
 use std::fs::File;
 use crate::command::sql::parser::sql_statement::CreateTableStatement;
 use crate::{command::sql::parser::sql_statement::SelectStatement, utils::varint::parse_varint};
-use crate::models::record::Record;
+use crate::models::dbfile::dbtable::record::Record;
 use std::io::{Seek, SeekFrom, Read};
-use crate::models::tablepage::{Table, TablePage, LeafTablePage};
+use crate::models::dbfile::dbtable::tablepage::{Table, TablePage, LeafTablePage};
 
 
 #[derive(Debug)]
