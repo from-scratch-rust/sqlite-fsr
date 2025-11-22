@@ -4,13 +4,12 @@ use crate::models::dbfile::dbtable::record::Record;
 use crate::models::dbfile::table::DBTable;
 
 pub fn select(table: &mut DBTable, mut statement: SelectStatement) -> Vec<Record> {
-    // take aggregator out of the statement so we can pass the (now non-aggregating) statement
     let aggregator = statement.aggregator_function.take();
 
-    let table_rows = table.to_table_rows(statement);
+    let mut table_rows = table.to_table_rows(statement);
 
     if let Some(aggregator_function) = aggregator {
-        return aggregate_table_rows(table_rows, aggregator_function);
+        table_rows = aggregate_table_rows(table_rows, aggregator_function);
     }
 
     table_rows

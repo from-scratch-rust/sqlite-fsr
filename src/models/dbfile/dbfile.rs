@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 use crate::models::dbfile::dbtable::Records;
 use crate::models::dbfile::schema::SchemaRAW;
 use crate::command::sql::parser::sql_statement::SQLStatement;
@@ -18,12 +18,17 @@ pub struct DBFile {
 }
 
 impl DBFile {
-    pub fn open(path: PathBuf) -> io::Result<Self> {
+    // pub fn open(path: PathBuf) -> io::Result<Self> {
+    //     let mut file = File::open(path)?;
+    //     let schema = Self::extract_raw_schema_data(&mut file);
+    //     Ok(Self { file, schema })
+    // }
+
+    pub fn open<P: AsRef<Path>>(path: P) -> io::Result<Self> {
         let mut file = File::open(path)?;
         let schema = Self::extract_raw_schema_data(&mut file);
         Ok(Self { file, schema })
     }
-
 
     fn extract_raw_schema_data<R: Read + Seek>(file: &mut R) -> SchemaRAW {
         // Read the 2-byte page size at offset 16

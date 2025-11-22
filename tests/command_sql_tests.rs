@@ -14,7 +14,7 @@ fn test_COUNT_sql_command_executes_without_error() {
 
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows() {
-    let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
+    let mut file = DBFile::open("./tests/assets/sample.db").unwrap();
     let sql_statement = "SELECT COUNT(*) FROM apples".to_sql_statment().unwrap();
     let result: Vec<String> = file.execute(sql_statement).unwrap()
                                                          .iter()
@@ -25,7 +25,7 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows() {
 
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows_2() {
-    let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
+    let mut file = DBFile::open("./tests/assets/sample.db").unwrap();
     let sql_statement = "SELECT COUNT(*) FROM oranges".to_sql_statment().unwrap();
     let result: Vec<String> = file.execute(sql_statement).unwrap()
                                                          .iter()
@@ -36,7 +36,7 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows_2() {
 
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows_3() {
-    let mut file = DBFile::open(PathBuf::from("./tests/assets/superheroes.db")).unwrap();
+    let mut file = DBFile::open("./tests/assets/superheroes.db").unwrap();
     let sql_statement = "SELECT COUNT(*) FROM superheroes".to_sql_statment().unwrap();
     let result: Vec<String> = file.execute(sql_statement).unwrap()
                                                          .iter()
@@ -47,7 +47,7 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows_3() {
 
 #[test]
 fn test_COUNT_sql_command_returns_correct_number_of_rows_4() {
-    let mut file = DBFile::open(PathBuf::from("./tests/assets/companies.db")).unwrap();
+    let mut file = DBFile::open("./tests/assets/companies.db").unwrap();
     let sql_statement = "SELECT COUNT(*) FROM companies".to_sql_statment().unwrap();    
     let result: Vec<String> = file.execute(sql_statement).unwrap()
                                                          .iter()
@@ -58,7 +58,7 @@ fn test_COUNT_sql_command_returns_correct_number_of_rows_4() {
 
 #[test]
 fn test_SELECT_sql_command_returns_correct_values() {
-    let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
+    let mut file = DBFile::open("./tests/assets/sample.db").unwrap();
     let sql_statement = "SELECT name FROM apples".to_sql_statment().unwrap();    
     let result: Vec<String> = file.execute(sql_statement).unwrap()
                                                          .iter()
@@ -70,7 +70,7 @@ fn test_SELECT_sql_command_returns_correct_values() {
 
 #[test]
 fn test_SELECT_sql_command_returns_correct_values_2() {
-    let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
+    let mut file = DBFile::open("./tests/assets/sample.db").unwrap();
     let sql_statement = "SELECT name, color FROM apples".to_sql_statment().unwrap();    
 
     let result: Vec<String> = file.execute(sql_statement).unwrap()
@@ -85,7 +85,7 @@ fn test_SELECT_sql_command_returns_correct_values_2() {
 
 #[test]
 fn test_SELECT_sql_command_returns_correct_values_3() {
-    let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
+    let mut file = DBFile::open("./tests/assets/sample.db").unwrap();
     let sql_statement = "SELECT * FROM apples".to_sql_statment().unwrap();
     let result: Vec<String> = file.execute(sql_statement).unwrap()
                                                          .iter()
@@ -98,7 +98,7 @@ fn test_SELECT_sql_command_returns_correct_values_3() {
 
 #[test]
 fn test_COUNT_sql_command_returns_error_when_table_not_found() {
-    let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
+    let mut file = DBFile::open("./tests/assets/sample.db").unwrap();
     let result = "SELECT COUNT(*) FROM seafood".to_sql_statment()
                         .map_err(|e| sqlite_fsr::models::error::SQLCommandError::UnsupportedCommand(e.to_string()))
                         .and_then(|stmt| file.execute(stmt));
@@ -109,7 +109,7 @@ fn test_COUNT_sql_command_returns_error_when_table_not_found() {
 
 #[test]
 fn test_sql_command_returns_error_when_command_not_supported() {
-    let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
+    let mut file = DBFile::open("./tests/assets/sample.db").unwrap();
     let result = "WHOOPTY COUNT(*) FROM seafood".to_sql_statment()
                         .map_err(|e| sqlite_fsr::models::error::SQLCommandError::UnsupportedCommand(e.to_string()))
                         .and_then(|stmt| file.execute(stmt));
