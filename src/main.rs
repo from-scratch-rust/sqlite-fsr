@@ -1,11 +1,11 @@
 pub mod utils;
 pub mod models;
 pub mod command;
-use std::path::PathBuf;
 use crate::models::error::*;
 use crate::command::sql;
-use crate::command::sql::parser::sql_statement::ToSQLStatement;
+use std::path::PathBuf;
 use crate::models::DBFile;
+
 
 fn main()  {
     let args = std::env::args().collect::<Vec<String>>();
@@ -19,7 +19,8 @@ fn main()  {
 
 
 
-pub fn run(args: &[String]) -> Result<String, RunError> {
+
+fn run(args: &[String]) -> Result<String, RunError> {
     if args.len() <= 1 {
         return Err(CommandArgsError::MissingArgs)?;
     }
@@ -41,20 +42,14 @@ pub fn run(args: &[String]) -> Result<String, RunError> {
     let output = match command[0] {
                         ".dbinfo" => {
                             let (page_size, table_count) = file.get_dbinfo();
-                            Ok(format!(
-                                "database page size: {}\nnumber of tables: {}",
-                                page_size, table_count
-                            ))
+                            Ok(format!("database page size: {}\nnumber of tables: {}", page_size, table_count))
                         }
                         ".tables" => {
                             let tables = file.get_table_names();
                             Ok(format!("{}", tables.join(" ")))
                         }
                         "SELECT" => {
-                            let sql_statement = command.to_sql_statment()
-                                                        .map_err(|err| SQLCommandError::UnsupportedCommand(err.to_string()))?;
-
-                            let result = file.execute(sql_statement);
+                            let result = file.execute(command);
                             match result {
                                 Ok(rows) => Ok(format!("{}", rows)),
                                 Err(e) => Err(e)?
@@ -63,6 +58,56 @@ pub fn run(args: &[String]) -> Result<String, RunError> {
                         _ => Err(CommandArgsError::InvalidCommand(command[0].to_owned()))?
                     };
     return output;
+}
+
+
+
+
+
+
+
+#[test]
+fn test_run_fails_when_missing_all_args() {
+    let args = vec![String::new()];
+    let result = run(&args).unwrap_err();
+    assert!(matches!(result, RunError::Args(CommandArgsError::MissingArgs)));
+}
+
+#[test]
+fn test_run_fails_when_missing_one_args() {
+    let args = vec![String::new(), String::from("./tests/assets/sample.db")];
+    let result = run(&args).unwrap_err();
+    assert!( matches!(result, RunError::Args(CommandArgsError::MissingCommand)));
+}
+
+#[test]
+fn test_run_fails_when_invalid_command() {
+    let args = vec![String::new(), String::from("./tests/assets/sample.db"), String::from(".dbpictures")];
+    let result = run(&args).unwrap_err();
+    assert!( matches!(result, RunError::Args(CommandArgsError::InvalidCommand(_))));
+}
+
+#[test]
+fn test_run_succeeds_when_valid_command() {
+    let args = vec![String::new(), String::from("./tests/assets/sample.db"), String::from(".dbinfo")];
+    let result = run(&args);
+    assert!(result.is_ok());
+}
+
+
+#[test]
+fn test_run_returns_correct_output() {
+    let args = vec![String::new(), String::from("./tests/assets/sample.db"), String::from("SELECT * FROM apples;")];
+    let result = run(&args).unwrap();
+    assert_eq!(result, String::from("1 Granny Smith Light Green\n2 Fuji Red\n3 Honeycrisp Blush Red\n4 Golden Delicious Yellow\n"));
+}
+
+
+#[test]
+fn test_run_fails_when_invalid_filepath() {
+    let args = vec![String::new(), String::from("../tests/assets/fake/index.db"), String::from(".dbinfo")];
+    let result = run(&args).unwrap_err();
+    assert!(matches!(result, RunError::Args(CommandArgsError::Io(_))));
 }
 
 
