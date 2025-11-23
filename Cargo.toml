@@ -1,6 +1,6 @@
 [package]
 name = "sqlite-fsr"
-version = "1.0.18"
+version = "1.0.19"
 authors = ["fsr <hello@fsr.io>"]
 edition = "2021"
 rust-version = "1.80"
