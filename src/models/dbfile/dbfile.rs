@@ -1,12 +1,13 @@
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
-use std::path::PathBuf;
-use crate::models::dbfile::dbtable::Records;
+use std::path::{PathBuf, Path};
+use crate::models::dbfile::dbtable::TableRows;
 use crate::models::dbfile::schema::SchemaRAW;
-use crate::command::sql::parser::sql_statement::SQLStatement;
+use crate::command::sql::parser::sql_statement::{SQLStatement, ToSQLStatement};
 use crate::models::dbfile::schema::schemarow::SchemaRow;
 use crate::command::sql;
 use crate::models::dbfile::dbtable::DBTable;
+use crate::models::error::SQLError;
 use std::ops::Deref;
 use std::ops::DerefMut;
 use std::io;
@@ -18,12 +19,11 @@ pub struct DBFile {
 }
 
 impl DBFile {
-    pub fn open(path: PathBuf) -> io::Result<Self> {
+    pub fn open<P: AsRef<Path>>(path: P) -> io::Result<Self> {
         let mut file = File::open(path)?;
         let schema = Self::extract_raw_schema_data(&mut file);
         Ok(Self { file, schema })
     }
-
 
     fn extract_raw_schema_data<R: Read + Seek>(file: &mut R) -> SchemaRAW {
         // Read the 2-byte page size at offset 16
@@ -67,14 +67,15 @@ impl DBFile {
         return table_names;
     }
 
-    pub fn execute(&mut self, sql_statement: SQLStatement) -> Result<Records, SQLCommandError> {
+    pub fn execute<T: ToSQLStatement>(&mut self, sql_statement_string: T) -> Result<TableRows, SQLError> {
+        let sql_statement = sql_statement_string.to_sql_statment()?;
         match sql_statement {
             SQLStatement::Select(statement) => {
                 let mut table = self.get_table(&statement.table_name)?;
                 let results = sql::select(&mut table, statement);
-                Ok(Records::from(results))
+                Ok(TableRows::from(results))
             },
-            _ => Err(SQLCommandError::UnsupportedCommand(String::new()))
+            _ => Err(SQLError::Command(SQLCommandError::UnsupportedCommand("Unsupported Command in statement".to_string())))
         }
     }
 

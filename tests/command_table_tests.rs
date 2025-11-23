@@ -5,7 +5,7 @@ use sqlite_fsr::models::DBFile;
 
 #[test]
 fn test_tables_command_reads_table_names_correctly() {
-    let mut file = DBFile::open(PathBuf::from("./tests/assets/sample.db")).unwrap();
+    let mut file = DBFile::open("./tests/assets/sample.db").unwrap();
     let result = file.get_table_names();
     assert_eq!(result, ["apples", "oranges"]);
 }

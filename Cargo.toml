@@ -7,7 +7,7 @@ rust-version = "1.80"
 repository = "https://github.com/from-scratch-rust/sqlite-fsr"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
-description = "A from-scratch Rust implementation of a minimal SQLite-like database."
+description = "A from-scratch Rust implementation of a minimal SQLite database."
 
 [dependencies]
 anyhow = "1.0.68"                                # error handling

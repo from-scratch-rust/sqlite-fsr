@@ -33,11 +33,21 @@ pub enum SQLSyntaxError {
 }
 
 #[derive(Debug, thiserror::Error)]
+pub enum SQLError {
+    #[error(transparent)]
+    Command(#[from] SQLCommandError),
+
+    #[error(transparent)]
+    Syntax(#[from] SQLSyntaxError),
+}
+
+
+#[derive(Debug, thiserror::Error)]
 pub enum RunError {
     #[error(transparent)]
     Args(#[from] CommandArgsError),
 
     #[error(transparent)]
-    Sql(#[from] SQLCommandError),
+    Sql(#[from] SQLError),
 }
 

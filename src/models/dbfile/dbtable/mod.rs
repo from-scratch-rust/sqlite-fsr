@@ -1,5 +1,6 @@
-pub mod record;
 pub mod tablepage;
 pub mod table;
 pub use table::DBTable;
-pub use record::Records;
+
+pub mod tablerow;
+pub use tablerow::{TableRow, TableRows};
