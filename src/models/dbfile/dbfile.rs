@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 use std::path::{PathBuf, Path};
-use crate::models::dbfile::dbtable::Records;
+use crate::models::dbfile::dbtable::TableRows;
 use crate::models::dbfile::schema::SchemaRAW;
 use crate::command::sql::parser::sql_statement::{SQLStatement, ToSQLStatement};
 use crate::models::dbfile::schema::schemarow::SchemaRow;
@@ -67,13 +67,13 @@ impl DBFile {
         return table_names;
     }
 
-    pub fn execute<T: ToSQLStatement>(&mut self, sql_statement_string: T) -> Result<Records, SQLError> {
+    pub fn execute<T: ToSQLStatement>(&mut self, sql_statement_string: T) -> Result<TableRows, SQLError> {
         let sql_statement = sql_statement_string.to_sql_statment()?;
         match sql_statement {
             SQLStatement::Select(statement) => {
                 let mut table = self.get_table(&statement.table_name)?;
                 let results = sql::select(&mut table, statement);
-                Ok(Records::from(results))
+                Ok(TableRows::from(results))
             },
             _ => Err(SQLError::Command(SQLCommandError::UnsupportedCommand("Unsupported Command in statement".to_string())))
         }

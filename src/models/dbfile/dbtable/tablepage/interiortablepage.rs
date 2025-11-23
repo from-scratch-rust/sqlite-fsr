@@ -1,7 +1,7 @@
 use std::fs::File;
 use crate::command::sql::parser::sql_statement::CreateTableStatement;
 use crate::{command::sql::parser::sql_statement::SelectStatement, utils::varint::parse_varint};
-use crate::models::dbfile::dbtable::record::Record;
+use crate::models::dbfile::dbtable::tablepage::Record;
 use std::io::{Seek, SeekFrom, Read};
 use crate::models::dbfile::dbtable::tablepage::{Table, TablePage, LeafTablePage};
 
@@ -46,7 +46,7 @@ impl<'a> InteriorTablePage<'a> {
 }
 
 impl Table for InteriorTablePage<'_> {
-    fn to_table_rows(&mut self, statement: &SelectStatement, table_description: &CreateTableStatement) -> Vec<Record> {
+    fn to_table_records(&mut self, statement: &SelectStatement, table_description: &CreateTableStatement) -> Vec<Record> {
         let mut result: Vec<Record> = Vec::new();
         for index in 0..self.cells.len() {
             let cell = self.cells[index];
@@ -72,7 +72,7 @@ impl Table for InteriorTablePage<'_> {
                                                 },
                                                 e => panic!("unsupported page type {}", e),
                                             };
-            let table_rows = table_page.to_table_rows(statement, table_description);
+            let table_rows = table_page.to_table_records(statement, table_description);
 
             result.extend(table_rows);
         }
@@ -93,7 +93,7 @@ impl Table for InteriorTablePage<'_> {
                                                                     _    => panic!("unsupported page type"),
                                                                 };
                 if sibling_tablepage.is_some() {
-                    let sibling_tablepage_rows = sibling_tablepage.unwrap().to_table_rows(statement, table_description);
+                    let sibling_tablepage_rows = sibling_tablepage.unwrap().to_table_records(statement, table_description);
                     result.extend(sibling_tablepage_rows);
                 }
 

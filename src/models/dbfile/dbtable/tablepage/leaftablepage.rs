@@ -1,6 +1,6 @@
-use crate::command::sql::parser::sql_statement::{AggregatorFunction, CreateTableStatement, SelectStatement};
+use crate::command::sql::parser::sql_statement::{CreateTableStatement, SelectStatement};
 use crate::utils::varint::parse_varint;
-use crate::models::dbfile::dbtable::record::Record;
+use crate::models::dbfile::dbtable::tablepage::Record;
 use crate::models::dbfile::dbtable::tablepage::Table;
 
 #[derive(Debug)]
@@ -45,7 +45,7 @@ impl LeafTablePage {
 
 impl Table for LeafTablePage {
 
-    fn to_table_rows(&mut self, statement: &SelectStatement, table_description: &CreateTableStatement) -> Vec<Record> {
+    fn to_table_records(&mut self, statement: &SelectStatement, table_description: &CreateTableStatement) -> Vec<Record> {
         let mut table_rows: Vec<Record> = Vec::new();
         for cells_index in 0..self.cells.len() {
             let cell = &self.cells[cells_index];
@@ -71,13 +71,12 @@ impl Table for LeafTablePage {
                                                                               .filter(|(column_description, _)| statement_columns.contains(column_description.0))
                                                                               .collect();
                
-                let selected_columns_value_sizes: Vec<i64> = selected_columns.iter().map(|column| column.0.1.clone()).collect();
                 let selected_columns_values: Vec<Vec<u8>> = selected_columns.iter().map(|column| column.1.clone()).collect();
 
-                let table_row = Record { row_id, column_values: selected_columns_values, column_headers: selected_columns_value_sizes };
+                let table_row = Record { row_id, column_values: selected_columns_values};
                 table_rows.push(table_row);        
             } else {
-                let table_row = Record { row_id, column_values, column_headers: column_value_sizes };
+                let table_row = Record { row_id, column_values};
                 table_rows.push(table_row);        
             }
 
