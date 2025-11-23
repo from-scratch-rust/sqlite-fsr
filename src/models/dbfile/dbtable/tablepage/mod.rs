@@ -7,7 +7,6 @@ pub mod leaftablepage;
 pub use leaftablepage::LeafTablePage;
 
 pub mod record;
-pub use record::Records;
 pub use record::Record;
 
 pub trait Table {
